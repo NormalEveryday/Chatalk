@@ -8,4 +8,27 @@
     <color name="colorBlack">#131313</color>
     <color name="colorRed">#D63D3D</color>
     <color name="colorGreen">#6DB63D</color>
+<!--    <color name="backgroundButton">-->
+<!--        <?xml version="1.0" encoding="utf-8"?>-->
+<!--        <selector xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--            &lt;!&ndash;When Button is in pressed state &ndash;&gt;-->
+<!--            <item android:state_pressed="true" android:color="#fff" />-->
+<!--            &lt;!&ndash;When Button is in selected state &ndash;&gt;-->
+<!--            <item android:state_selected="true" android:color="#131313" />-->
+<!--            &lt;!&ndash;Default Background Color &ndash;&gt;-->
+<!--            <item android:color="@android:color/white" />-->
+
+<!--        </selector>-->
+<!--    </color>-->
+<!--    <color name="textButton">-->
+<!--        <?xml version="1.0" encoding="utf-8"?>-->
+<!--        <selector xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+<!--            &lt;!&ndash;When button is enabled&ndash;&gt;-->
+<!--            <item android:state_selected="true" android:color="@android:color/black" />-->
+<!--            &lt;!&ndash;Default Text Color&ndash;&gt;-->
+<!--            <item android:color="#fff" />-->
+
+<!--        </selector>-->
+<!--    </color>-->
 </resources>
