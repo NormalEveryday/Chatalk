@@ -18,22 +18,19 @@
         android:layout_marginEnd="50dp"
         android:layout_marginBottom="50dp"
         android:background="@drawable/conor">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chatalk"
-            android:textSize="40sp"
-            android:textStyle="bold"
-            android:gravity="center"
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
-            android:id="@+id/title"/>
+            android:background="@drawable/ic_launcher_foreground"/>
         <TextView
             android:id="@+id/loginView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="100sp"
             android:gravity="center"
-            android:text="Sign in"
+            android:text="Chatalk"
             android:textSize="36sp"
             android:textStyle="bold" />
 
