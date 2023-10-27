@@ -72,6 +72,7 @@
             android:layout_below="@id/inputPassword"
             android:layout_marginRight="16dp"
             android:gravity="right"
+            android:textStyle="italic"
             android:text="Forgor password" />
 
         <Button
@@ -85,9 +86,11 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
-            android:text="Login" />
+            android:textStyle="bold"
+            android:text="Sign in" />
 
         <TextView
+            android:textStyle="italic"
             android:id="@+id/registerbtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
