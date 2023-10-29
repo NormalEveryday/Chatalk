@@ -120,7 +120,7 @@ public class SetupActivity extends AppCompatActivity {
                                 hashMap.put("description", mydesc);
                                 hashMap.put("profileImage",uri.toString());
                                 hashMap.put("status","offline");
-                                mRef.child(mUser.getUid()).updateChildren(hashMap).addOnSuccessListener(new OnSuccessListener() {
+                                mRef.child(mUser.getUid()).setValue(hashMap).addOnSuccessListener(new OnSuccessListener() {
                                     @Override
                                     public void onSuccess(Object o) {
 

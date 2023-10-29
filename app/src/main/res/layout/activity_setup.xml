@@ -7,8 +7,8 @@
     tools:context=".SetupActivity"
     android:background="#131313">
 
-    <include layout="@layout/main_appbar"
-        android:id="@+id/app_bar" />
+<!--    <include layout="@layout/main_appbar"-->
+<!--        android:id="@+id/app_bar" />-->
 
     <androidx.cardview.widget.CardView
 
@@ -18,7 +18,7 @@
         app:cardCornerRadius="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout

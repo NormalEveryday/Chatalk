@@ -3,10 +3,11 @@
 
 
     <!--When Button is in pressed state -->
-    <item android:state_pressed="true" android:color="#fff" />
+    <item android:state_pressed="true" android:color="#fff" android:background="@drawable/conor_no_background"/>
     <!--When Button is in selected state -->
-    <item android:state_selected="true" android:color="#131313" />
+    <item android:state_selected="true" android:color="#131313" android:background="@drawable/conor_no_background"/>
     <!--Default Background Color -->
-    <item android:color="#131313" />
+    <item android:color="#131313" android:background="@drawable/conor_no_background"/>
+
 
 </selector>
