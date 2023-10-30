@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Layer 1: Black Background -->
-    <item android:drawable="@color/colorBlack" />
-
-    <!-- Layer 2: Existing Border Drawable -->
-    <item android:drawable="@drawable/border" />
-</layer-list>

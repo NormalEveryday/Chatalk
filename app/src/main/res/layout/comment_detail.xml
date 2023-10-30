@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="2dp"
+    android:layout_margin="8dp"
+    >
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="12dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profileImagePost"
+                android:layout_width="65dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/profileUsernamePost"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:text="TextView"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/profileImagePost"
+                app:layout_constraintTop_toTopOf="@+id/profileImagePost" />
+
+            <TextView
+                android:id="@+id/timeAgo"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="TextView"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/profileUsernamePost"
+                app:layout_constraintTop_toBottomOf="@+id/profileUsernamePost" />
+
+            <TextView
+                android:id="@+id/postDesc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="TextView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/profileImagePost" />
+
+            <ImageView
+                android:id="@+id/postImage"
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/postDesc"
+                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+            <ImageView
+                android:id="@+id/likeImage"
+                android:layout_width="54dp"
+                android:layout_height="53dp"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/ic_thumb_up_foreground"
+                app:layout_constraintStart_toStartOf="@+id/profileImagePost"
+                app:layout_constraintTop_toBottomOf="@+id/postImage" />
+
+            <ImageView
+                android:id="@+id/commentsImage"
+                android:layout_width="57dp"
+                android:layout_height="53dp"
+                android:background="@drawable/ic_chat"
+                app:layout_constraintBottom_toBottomOf="@+id/likeCounter"
+                app:layout_constraintStart_toEndOf="@+id/likeCounter"
+                app:layout_constraintTop_toTopOf="@+id/likeCounter" />
+
+            <TextView
+                android:id="@+id/likeCounter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                app:layout_constraintBottom_toBottomOf="@+id/likeImage"
+                app:layout_constraintStart_toEndOf="@+id/likeImage"
+                app:layout_constraintTop_toTopOf="@+id/likeImage" />
+
+            <TextView
+                android:id="@+id/commentsCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                app:layout_constraintBottom_toBottomOf="@+id/commentsImage"
+                app:layout_constraintStart_toEndOf="@+id/commentsImage"
+                app:layout_constraintTop_toTopOf="@+id/commentsImage" />
+
+            <View
+                android:id="@+id/view"
+                android:layout_width="300dp"
+                android:layout_height="2dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/colorPrimaryDark"
+                android:foregroundGravity="center"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/commentsImage" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintEnd_toEndOf="@+id/view"
+                app:layout_constraintStart_toStartOf="@+id/view"
+                app:layout_constraintTop_toBottomOf="@+id/view" />
+
+
+            <EditText
+                android:id="@+id/inputComment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/border_text"
+                android:ems="10"
+                android:inputType="text"
+                android:padding="5dp"
+                android:text="Comment here"
+                app:layout_constraintEnd_toEndOf="@+id/recyclerView2"
+                app:layout_constraintStart_toStartOf="@+id/recyclerView2"
+                app:layout_constraintTop_toBottomOf="@+id/recyclerView2" />
+
+            <ImageView
+                android:id="@+id/sendComment"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="4dp"
+                app:layout_constraintBottom_toBottomOf="@+id/inputComment"
+                app:layout_constraintEnd_toEndOf="@+id/inputComment"
+                app:layout_constraintTop_toTopOf="@+id/inputComment"
+                app:layout_constraintVertical_bias="0.0"
+                app:srcCompat="@drawable/ic_send" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/inputComment"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

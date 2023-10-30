@@ -69,8 +69,8 @@ public class LoginActivity extends AppCompatActivity {
         } else if (password.isEmpty() || password.length() < 8) {
             showError(inputPassword, "Pass work must be greater than 8 character");
         }else {
-            loadingbar.setTitle("Registration");
-            loadingbar.setMessage("Registration is in progress");
+            loadingbar.setTitle("Login");
+            loadingbar.setMessage("Login is in progress");
             loadingbar.setCanceledOnTouchOutside(false);
             loadingbar.show();
 
