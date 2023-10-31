@@ -12,6 +12,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.StorageReference;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -154,5 +155,25 @@ public class MyHolder extends RecyclerView.ViewHolder {
 
             }
         });
+    }
+
+    public void CountComment(DatabaseReference CommentRef) {
+        CommentRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    int totalComment =(int) snapshot.getChildrenCount();
+                    commentsCounter.setText(totalComment+"");
+                }else{
+                    commentsCounter.setText("0");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 }

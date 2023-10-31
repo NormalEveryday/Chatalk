@@ -37,6 +37,7 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@drawable/conor_text_input"
                 android:hint="Email"
                 android:inputType="textEmailAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -52,6 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Password"
+                android:background="@drawable/conor_text_input"
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -69,11 +71,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Confirm Password"
+                android:background="@drawable/conor_text_input"
                 android:inputType="textPassword"/>
         </com.google.android.material.textfield.TextInputLayout>
 
 
         <Button
+            android:textSize="20dp"
             android:backgroundTint="@color/backgroundbutton"
             android:textColor="@color/textbutton"
             android:id="@+id/registerbtn"

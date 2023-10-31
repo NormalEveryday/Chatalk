@@ -34,6 +34,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
+import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -61,7 +62,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     CircleImageView image_profile,profileImageHeader;
 
-    TextView usernameHeader;
+    TextView usernameHeader,emailHeader;
 
 
 
@@ -112,7 +113,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         image_profile = findViewById(R.id.profile_image);
         profileImageHeader = view.findViewById(R.id.profile_image_header);
         usernameHeader = view.findViewById(R.id.usernameHeader);
-
+        emailHeader = view.findViewById(R.id.emailHeader);
 
         inputComment = findViewById(R.id.inputComment);
         sendComment = findViewById(R.id.sendComment);
@@ -163,7 +164,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         if(item.getItemId() == R.id.home){
 
         }else if (item.getItemId() == R.id.profile) {
-
+            startActivity(new Intent(MainActivity.this,ProfileActivity.class));
         }else if (item.getItemId() == R.id.friendlist) {
 
         }else if (item.getItemId() == R.id.findfriend) {
@@ -171,7 +172,9 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         }else if (item.getItemId() == R.id.chat) {
 
         }else if (item.getItemId() == R.id.logout) {
-
+            mAuth.signOut();
+            startActivity(new Intent(MainActivity.this,SplashActivity.class));
+            finish();
         }
         return true;
     }
@@ -208,25 +211,32 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         }
 
         searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            DatabaseReference originalQuery = FirebaseDatabase.getInstance().getReference("Posts");
+
             @Override
             public boolean onQueryTextSubmit(String s) {
-                //
+
                 return false;
             }
+
+
 
             @Override
             public boolean onQueryTextChange(String s) {
+                if(s.isEmpty()){
 
-                //
-                return false;
+                }
+                return true;
             }
         });
+
         return true;
     }
 
 
+
     private void LoadPost() {
-        Query query = FirebaseDatabase.getInstance().getReference("Posts");
+        Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("datePost");
         options = new FirebaseRecyclerOptions.Builder<Posts>().setQuery(query,Posts.class).build();
         adapter = new FirebaseRecyclerAdapter<Posts, MyHolder>(options) {
             @Override
@@ -239,6 +249,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
                 holder.countLikes(postKey,mUser.getUid(),LikeRef);
+                CommentRef = FirebaseDatabase.getInstance().getReference("Posts").child(postKey).child("Comments");
+                holder.CountComment(CommentRef);
                 holder.likeImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -322,7 +334,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if(task.isSuccessful()){
-                        postImageRef.child(mUser.getUid() + strDate).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        postImageRef.child(mUser.getUid()+strDate).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
                                 HashMap hashMap = new HashMap();
@@ -331,7 +343,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                                 hashMap.put("postDesc",desc);
                                 hashMap.put("userProfileImage",profileImageUrlView);
                                 hashMap.put("username",usernameView);
-                                PostRef.child(mUser.getUid() + strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                hashMap.put("uid",mUser.getUid());
+                                PostRef.child(mUser.getUid()+strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
                                     public void onComplete(@NonNull Task task) {
                                         if(task.isSuccessful()){
@@ -391,6 +404,10 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
                         }
                         if(usernameView !=null){usernameHeader.setText(usernameView);}
+                        if(emailHeader!=null){
+                            emailHeader.setText(mUser.getEmail());
+                        }
+
                     }
                 }
 

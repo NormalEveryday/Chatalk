@@ -23,11 +23,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
 
@@ -57,22 +61,24 @@ public class SetupActivity extends AppCompatActivity {
         desc = findViewById(R.id.desc);
         email = findViewById(R.id.email);
         save = findViewById(R.id.saveInfo);
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
         StorageRef = FirebaseStorage.getInstance().getReference().child("ProfileImages");
         mloadingBar = new ProgressDialog(this);
         email.setText(mUser.getEmail());
+
+
+
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-
                 startActivityForResult(intent,REQUEST_CODE);
 
             }
         });
+
         save.setTextColor(Color.WHITE);
         save.setBackgroundColor(Color.BLACK);
         save.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +87,7 @@ public class SetupActivity extends AppCompatActivity {
                 SaveData();
             }
         });
+
     }
 
     @Override
@@ -107,6 +114,8 @@ public class SetupActivity extends AppCompatActivity {
             mloadingBar.setTitle("Setup profile");
             mloadingBar.setCanceledOnTouchOutside(false);
             mloadingBar.show();
+
+
             StorageRef.child(mUser.getUid()).putFile(imageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -142,6 +151,7 @@ public class SetupActivity extends AppCompatActivity {
                     }
                 }
             });
+
         }
     }
     private void showError(EditText inputEmail, String email_is_not_valid) {

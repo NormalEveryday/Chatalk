@@ -7,15 +7,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.sax.EndElementListener;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -69,14 +72,13 @@ public class CommentActivity extends AppCompatActivity {
     EditText inputComment;
 
 
-    TextView likeCounter,commentCounter;
+    TextView likeCounter,commentsCounter;
     FirebaseUser mUser;
     FirebaseAuth mAuth;
 
 
     FirebaseRecyclerOptions<Comment> commentOption;
     FirebaseRecyclerAdapter<Comment,CommentViewHolder> commentAdapter;
-
 
 
 
@@ -101,10 +103,11 @@ public class CommentActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         LikeRef = FirebaseDatabase.getInstance().getReference().child("Likes");
-        CommentRef = FirebaseDatabase.getInstance().getReference().child("Comments");
+
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
         StoreRef = FirebaseStorage.getInstance().getReference().child("ProfileImages");
         likeCounter = findViewById(R.id.likeCounter);
+        commentsCounter = findViewById(R.id.commentsCount);
         mRef.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -134,6 +137,80 @@ public class CommentActivity extends AppCompatActivity {
                 AddComment();
             }
         });
+        DatabaseReference likes = FirebaseDatabase.getInstance().getReference("Likes").child(getIntent().getStringExtra("postKey"));
+        likes.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    int totalLikes = (int)snapshot.getChildrenCount();
+                    likeCounter.setText(totalLikes+"");
+                    likeImage.setImageResource(R.drawable.ic_thumb_up_blue);
+
+
+                }else {
+                    likeImage.setImageResource(R.drawable.ic_thumb_up_foreground);
+                    likeCounter.setText("0");
+//                    likeImage.setImageResource(R.drawable.ic_thumb_up_blue);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        likeImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                likes.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.exists()){
+                            LikeRef.child(getIntent().getStringExtra("postKey")).child(mUser.getUid()).removeValue();
+                        }else {
+                            LikeRef.child(getIntent().getStringExtra("postKey")).child(mUser.getUid()).setValue("like");
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+            }
+        });
+
+        DatabaseReference comment = FirebaseDatabase.getInstance().getReference("Posts")
+                .child(getIntent().getStringExtra("postKey")).child("Comments");
+
+        comment.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    int totalComment = (int) snapshot.getChildrenCount();
+                    commentsCounter.setText(totalComment+"");
+                }else {
+                    commentsCounter.setText("0");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        commentImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                inputComment.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(CommentActivity.this.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(inputComment, InputMethodManager.SHOW_IMPLICIT);
+
+            }
+        });
+
 
         LoadComment();
 
@@ -146,9 +223,7 @@ public class CommentActivity extends AppCompatActivity {
 
         Query query = FirebaseDatabase.getInstance().getReference("Posts")
                 .child(getIntent().getStringExtra("postKey"))
-                .child("Comments");
-
-
+                .child("Comments").orderByChild("datePost");
 
         commentOption = new FirebaseRecyclerOptions.Builder<Comment>().setQuery(query,Comment.class).build();
         commentAdapter = new FirebaseRecyclerAdapter<Comment, CommentViewHolder>(commentOption) {
@@ -158,6 +233,7 @@ public class CommentActivity extends AppCompatActivity {
                 holder.username.setText(model.getUsername());
                 holder.comment.setText(model.getComment());
                 Log.d("DEBUG","info comment:"+model.getComment()+model.getUsername()+model.getProfileImageUrl());
+
             }
             @NonNull
             @Override
