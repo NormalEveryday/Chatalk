@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,7 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(ProfileActivity.this,SetupActivity.class));
+                startActivity(new Intent(ProfileActivity.this, editProfileActivity.class));
             }
         });
 
@@ -91,10 +92,22 @@ public class ProfileActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull MyHolder holder, int position, @NonNull Posts model) {
                 final String postKey = getRef(position).getKey();
                 holder.postDesc.setText(model.getPostDesc());
-                holder.username.setText(model.getUsername());
+//                holder.username.setText(model.getUsername());
                 holder.timeAgo.setText(model.getDatePost());
+                DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("Users");
+                mRef.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        holder.username.setText(snapshot.child("username").getValue().toString());
+                        Picasso.get().load(snapshot.child("profileImage").getValue().toString()).into(holder.userProfileImage);
+                    }
 
-                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+//                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
                 holder.countLikes(postKey,mUser.getUid(),LikeRef);
                 CommentRef = FirebaseDatabase.getInstance().getReference("Posts").child(postKey).child("Comments");

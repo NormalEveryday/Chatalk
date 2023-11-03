@@ -162,7 +162,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.home){
-
+            startActivity(new Intent(MainActivity.this,MainActivity.class));
         }else if (item.getItemId() == R.id.profile) {
             startActivity(new Intent(MainActivity.this,ProfileActivity.class));
         }else if (item.getItemId() == R.id.friendlist) {
@@ -243,10 +243,23 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             protected void onBindViewHolder(@NonNull MyHolder holder, int position, @NonNull Posts model) {
                 final String postKey = getRef(position).getKey();
                 holder.postDesc.setText(model.getPostDesc());
-                holder.username.setText(model.getUsername());
-                holder.timeAgo.setText(model.getDatePost());
 
-                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
+                holder.timeAgo.setText(model.getDatePost());
+                DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("Users");
+                mRef.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        holder.username.setText(snapshot.child("username").getValue().toString());
+                        Picasso.get().load(snapshot.child("profileImage").getValue().toString()).into(holder.userProfileImage);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+//                holder.username.setText(model.getUsername());
+//                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
                 holder.countLikes(postKey,mUser.getUid(),LikeRef);
                 CommentRef = FirebaseDatabase.getInstance().getReference("Posts").child(postKey).child("Comments");
@@ -341,8 +354,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                                 hashMap.put("datePost",strDate);
                                 hashMap.put("postImageUrl",uri.toString());
                                 hashMap.put("postDesc",desc);
-                                hashMap.put("userProfileImage",profileImageUrlView);
-                                hashMap.put("username",usernameView);
+//                                hashMap.put("userProfileImage",profileImageUrlView);
+//                                hashMap.put("username",usernameView);
                                 hashMap.put("uid",mUser.getUid());
                                 PostRef.child(mUser.getUid()+strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
