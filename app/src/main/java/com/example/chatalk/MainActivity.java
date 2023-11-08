@@ -13,8 +13,12 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -47,6 +51,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -64,7 +69,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     TextView usernameHeader,emailHeader;
 
-
+    String imageurl;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
@@ -81,11 +86,16 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     ProgressDialog progressDialog;
     StorageReference postImageRef;
-    FirebaseRecyclerAdapter<Posts,MyHolder> adapter;
-    FirebaseRecyclerOptions<Posts> options;
+    public static FirebaseRecyclerAdapter<Posts,MyHolder> adapter;
+    public static FirebaseRecyclerOptions<Posts> options;
     RecyclerView recyclerView;
 
+
     String usernameView,profileImageUrlView;
+
+    public MainActivity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,7 +135,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         sendImagePost = findViewById(R.id.send_post_imageView);
         inputPostDesc = findViewById(R.id.inputAddPost);
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        MyHolder.recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
@@ -168,12 +178,28 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         }else if (item.getItemId() == R.id.friendlist) {
 
         }else if (item.getItemId() == R.id.findfriend) {
-
+            startActivity(new Intent(MainActivity.this,FindFriendActivity.class));
         }else if (item.getItemId() == R.id.chat) {
 
         }else if (item.getItemId() == R.id.logout) {
-            mAuth.signOut();
-            startActivity(new Intent(MainActivity.this,SplashActivity.class));
+            Toast.makeText(MainActivity.this,ProfileActivity.CurrentState,Toast.LENGTH_LONG).show();
+            if(ProfileActivity.CurrentState == "safemode"){
+                mUser.delete();
+                DatabaseReference mU = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
+                mU.removeValue();
+                // Chuyển người dùng đến màn hình SplashActivity
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                FirebaseAuth.getInstance().signOut();
+                ProfileActivity.CurrentState = "unsafemode";
+                Toast.makeText(MainActivity.this,ProfileActivity.CurrentState,Toast.LENGTH_SHORT).show();
+            }
+            if(ProfileActivity.CurrentState == "unsafemode"){
+                mAuth.signOut();
+                startActivity(new Intent(MainActivity.this,SplashActivity.class));
+            }
+
             finish();
         }
         return true;
@@ -236,6 +262,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
 
     private void LoadPost() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("datePost");
         options = new FirebaseRecyclerOptions.Builder<Posts>().setQuery(query,Posts.class).build();
         adapter = new FirebaseRecyclerAdapter<Posts, MyHolder>(options) {
@@ -243,26 +270,31 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             protected void onBindViewHolder(@NonNull MyHolder holder, int position, @NonNull Posts model) {
                 final String postKey = getRef(position).getKey();
                 holder.postDesc.setText(model.getPostDesc());
-
                 holder.timeAgo.setText(model.getDatePost());
-                DatabaseReference mRef = FirebaseDatabase.getInstance().getReference("Users");
-                mRef.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        holder.username.setText(snapshot.child("username").getValue().toString());
-                        Picasso.get().load(snapshot.child("profileImage").getValue().toString()).into(holder.userProfileImage);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-//                holder.username.setText(model.getUsername());
-//                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
+                holder.username.setText(model.getUsername());
+                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
+
+//                mRef.child(model.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        holder.username.setText(snapshot.child("username").getValue().toString());
+//                        imageurl = snapshot.child("profileImage").getValue().toString();
+//                        Picasso.get().load(snapshot.child("profileImage").getValue().toString()).into(holder.userProfileImage);
+//                        Log.d("DEBUG","user:"+snapshot.child("profileImage").getValue().toString());
+//                 ;
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+
+
                 holder.countLikes(postKey,mUser.getUid(),LikeRef);
-                CommentRef = FirebaseDatabase.getInstance().getReference("Posts").child(postKey).child("Comments");
+                CommentRef = FirebaseDatabase.getInstance().getReference("Comments").child(postKey);
+
                 holder.CountComment(CommentRef);
                 holder.likeImage.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -295,8 +327,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(MainActivity.this,CommentActivity.class);
-                        intent.putExtra("username",model.getUsername());
-                        intent.putExtra("image_profile",model.getUserProfileImage());
+                        intent.putExtra("username",holder.username.getText().toString());
+                        intent.putExtra("image_profile", model.getUserProfileImage());
                         intent.putExtra("timeAgo",model.getDatePost());
                         intent.putExtra("postDesc",model.getPostDesc());
                         intent.putExtra("PostImageUrl",model.getPostImageUrl());
@@ -354,8 +386,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                                 hashMap.put("datePost",strDate);
                                 hashMap.put("postImageUrl",uri.toString());
                                 hashMap.put("postDesc",desc);
-//                                hashMap.put("userProfileImage",profileImageUrlView);
-//                                hashMap.put("username",usernameView);
+                                hashMap.put("userProfileImage",profileImageUrlView);
+                                hashMap.put("username",usernameView);
                                 hashMap.put("uid",mUser.getUid());
                                 PostRef.child(mUser.getUid()+strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                     @Override

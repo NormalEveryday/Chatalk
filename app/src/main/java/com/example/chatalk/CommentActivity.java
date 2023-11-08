@@ -56,8 +56,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class CommentActivity extends AppCompatActivity {
-    FirebaseRecyclerAdapter<Posts,MyHolder> adapter;
-    //    FirebaseRecyclerOptions<Posts> options;
+
     DatabaseReference mRef,PostRef,LikeRef,CommentRef;
 
     FirebaseStorage storage;
@@ -121,6 +120,12 @@ public class CommentActivity extends AppCompatActivity {
         });
 
         LoadPost();
+        sendComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddComment();
+            }
+        });
 
     }
     public void LoadPost(){
@@ -130,13 +135,7 @@ public class CommentActivity extends AppCompatActivity {
         postDesc.setText(getIntent().getStringExtra("postDesc"));
         Picasso.get().load(getIntent().getStringExtra("PostImageUrl")).into(postImage);
 
-        sendComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
 
-                AddComment();
-            }
-        });
         DatabaseReference likes = FirebaseDatabase.getInstance().getReference("Likes").child(getIntent().getStringExtra("postKey"));
         likes.addValueEventListener(new ValueEventListener() {
             @Override
@@ -182,8 +181,8 @@ public class CommentActivity extends AppCompatActivity {
             }
         });
 
-        DatabaseReference comment = FirebaseDatabase.getInstance().getReference("Posts")
-                .child(getIntent().getStringExtra("postKey")).child("Comments");
+        DatabaseReference comment = FirebaseDatabase.getInstance().getReference("Comments")
+                .child(getIntent().getStringExtra("postKey"));
 
         comment.addValueEventListener(new ValueEventListener() {
             @Override
@@ -221,9 +220,9 @@ public class CommentActivity extends AppCompatActivity {
         MyHolder.recyclerView.setLayoutManager(new LinearLayoutManager(CommentActivity.this));
 
 
-        Query query = FirebaseDatabase.getInstance().getReference("Posts")
+        Query query = FirebaseDatabase.getInstance().getReference().child("Comments")
                 .child(getIntent().getStringExtra("postKey"))
-                .child("Comments").orderByChild("datePost");
+                .orderByChild("datePost");
 
         commentOption = new FirebaseRecyclerOptions.Builder<Comment>().setQuery(query,Comment.class).build();
         commentAdapter = new FirebaseRecyclerAdapter<Comment, CommentViewHolder>(commentOption) {
@@ -253,38 +252,43 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     private void AddComment() {
-        String timestamp = String.valueOf(System.currentTimeMillis());
+        final String timestamp = String.valueOf(System.currentTimeMillis());
+
         DatabaseReference User = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
-        User.addValueEventListener(new ValueEventListener() {
+        User.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                profileImageUrl = snapshot.child("profileImage").getValue(String.class);
-                username = snapshot.child("username").getValue(String.class);
-                Log.d("DEBUG","text: "+username + profileImageUrl);
-
-
-                HashMap hashMap = new HashMap();
-                String comment = inputComment.getText().toString();
-                hashMap.put("comment",comment);
-                hashMap.put("ptime", timestamp);
-                hashMap.put("username",username);
-                hashMap.put("profileImageUrl",profileImageUrl);
-                Log.d("DEBUG","text: "+username + profileImageUrl);
-                DatabaseReference dataref = FirebaseDatabase.getInstance().getReference("Posts").child(getIntent().getStringExtra("postKey")).child("Comments");
-                dataref.child(timestamp).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(CommentActivity.this,"Comment success",Toast.LENGTH_SHORT).show();
-                            inputComment.setText("");
+                if(snapshot.exists()){
+                    profileImageUrl = snapshot.child("profileImage").getValue(String.class);
+                    username = snapshot.child("username").getValue(String.class);
+                    Log.d("DEBUG","text: "+username + profileImageUrl);
+                    HashMap hashMap = new HashMap();
+                    String comment = inputComment.getText().toString();
+                    hashMap.put("comment",comment);
+                    hashMap.put("ptime", timestamp);
+                    hashMap.put("username",username);
+                    hashMap.put("uid",mUser.getUid());
+                    hashMap.put("profileImageUrl",profileImageUrl);
+                    Log.d("DEBUG","text: "+username + profileImageUrl);
+                    DatabaseReference dataref = FirebaseDatabase.getInstance().getReference().child("Comments").child(getIntent().getStringExtra("postKey"));
+                    dataref.child(timestamp).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+                                Toast.makeText(CommentActivity.this,"Comment success",Toast.LENGTH_SHORT).show();
+                                MainActivity.adapter.notifyDataSetChanged();
+//                                adapter.notifyDataSetChanged();
+                                inputComment.setText("");
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(CommentActivity.this, "Comment Failed", Toast.LENGTH_LONG).show();
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(CommentActivity.this, "Comment Failed", Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+
             }
 
             @Override

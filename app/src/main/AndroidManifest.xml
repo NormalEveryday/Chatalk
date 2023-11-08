@@ -13,6 +13,18 @@
         android:theme="@style/Theme.MediaApp"
         tools:targetApi="31">
         <activity
+            android:name=".ViewFriendActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ForgetPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileFriendsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".FindFriendActivity"
+            android:exported="false" />
+        <activity
             android:name=".editProfileActivity"
             android:exported="false" />
         <activity

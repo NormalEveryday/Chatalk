@@ -54,5 +54,13 @@ dependencies {
     //Firebase for UI
     implementation 'com.firebaseui:firebase-ui-database:8.0.2'
 
+    //Espresso Testing
+
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation 'androidx.test:rules:1.4.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+
 
 }

@@ -58,6 +58,13 @@ public class LoginActivity extends AppCompatActivity {
                 Login();
             }
         });
+
+        forgetPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(LoginActivity.this,ForgetPasswordActivity.class));
+            }
+        });
     }
 
 
@@ -73,8 +80,6 @@ public class LoginActivity extends AppCompatActivity {
             loadingbar.setMessage("Login is in progress");
             loadingbar.setCanceledOnTouchOutside(false);
             loadingbar.show();
-
-
             firebaseAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
