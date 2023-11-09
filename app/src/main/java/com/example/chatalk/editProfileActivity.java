@@ -92,25 +92,49 @@ public class editProfileActivity extends AppCompatActivity {
                                 String postID = dataSnapshot.getKey();
                                 DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts").child(postID);
                                 postRef.child("username").setValue(username.getText().toString());
-                                Query query2 = FirebaseDatabase.getInstance().getReference().child("Comments").child(postID)
-                                        .orderByChild("uid").equalTo(mUser.getUid());
-                                query2.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                        for(DataSnapshot dataSnapshot2 : snapshot.getChildren()){
-                                            String commentId = dataSnapshot2.getKey();
-                                            DatabaseReference comRef = FirebaseDatabase.getInstance().getReference("Comments").child(postID).child(commentId);
-                                            comRef.child("username").setValue(username.getText().toString());
-                                            comRef.child("comment").setValue(snapshot.child("comment").getValue().toString());
-                                            Toast.makeText(editProfileActivity.this,"change comment",Toast.LENGTH_LONG).show();
+                                // Cần sửa lại
+//                                Query query2 = FirebaseDatabase.getInstance().getReference().child("Comments").child(postID)
+//                                        .orderByChild("uid").equalTo(mUser.getUid());
+//                                query2.addValueEventListener(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                                        for(DataSnapshot dataSnapshot2 : snapshot.getChildren()){
+//                                            String commentId = dataSnapshot2.getKey();
+//                                            DatabaseReference comRef = dataSnapshot2.getRef().child(commentId);
+//                                            comRef.child("username").setValue(username.getText().toString());
+//                                        }
+//                                    }
+//                                    @Override
+//                                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                                    }
+//                                });
+                            }
+                        }
 
-                                        }
-                                    }
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError error) {
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Comments");
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for(DataSnapshot dataKeySnapShot :snapshot.getChildren()){
+                                String dateKey = dataKeySnapShot.getKey();
+                                for(DataSnapshot commentKeySnapShot : dataKeySnapShot.getChildren()){
+                                    String commentKey = commentKeySnapShot.getKey();
+                                    DataSnapshot commentSnapShot = commentKeySnapShot.child("uid");
+                                    if(commentSnapShot.getValue(String.class).equals(mUser.getUid())){
+                                        DatabaseReference updateRef = ref.child(dateKey).child(commentKey).child("username");
+                                        updateRef.setValue(username.getText().toString());
                                     }
-                                });
+
+
+                                }
                             }
                         }
 
@@ -152,7 +176,8 @@ public class editProfileActivity extends AppCompatActivity {
                                     HashMap hashMap = new HashMap();
                                     hashMap.put("username", username.getText().toString());
                                     hashMap.put("profileImage", uri.toString());
-                                    Log.d("DEBUG", "name user: " + username.getText().toString());
+                                    hashMap.put("description",description.getText().toString());
+                                    Log.d("DEBUG", "nameuser: " + username.getText().toString());
                                     Log.d("DEBUG", "image" + uri.toString());
                                     DatabaseReference root = FirebaseDatabase.getInstance().getReference();
 

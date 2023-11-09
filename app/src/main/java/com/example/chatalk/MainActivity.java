@@ -13,6 +13,7 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -92,6 +93,9 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
 
     String usernameView,profileImageUrlView;
+
+//    SharedPreferences sharedPreferences;
+//    SharedPreferences.Editor editor;
 
     public MainActivity() {
     }
@@ -193,6 +197,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 startActivity(intent);
                 FirebaseAuth.getInstance().signOut();
                 ProfileActivity.CurrentState = "unsafemode";
+                ProfileActivity.editor.putString(ProfileActivity.CURRENT_STATE_KEY, "unsafemode");
+                ProfileActivity.editor.apply();
                 Toast.makeText(MainActivity.this,ProfileActivity.CurrentState,Toast.LENGTH_SHORT).show();
             }
             if(ProfileActivity.CurrentState == "unsafemode"){

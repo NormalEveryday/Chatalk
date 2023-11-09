@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +55,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     public static String CurrentState = "unsafemode";
 
+    public static SharedPreferences sharedPreferences;
+    public static SharedPreferences.Editor editor;
+
+
+    public static final String PREFERENCE_FILE_KEY = "com.example.chatalk.PREFERENCES";
+    public static final String CURRENT_STATE_KEY = "CurrentState";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +86,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        CurrentState = sharedPreferences.getString(CURRENT_STATE_KEY, "unsafemode");
         PostRef = FirebaseDatabase.getInstance().getReference().child("Posts");
         //like child realtime db
         LikeRef = FirebaseDatabase.getInstance().getReference().child("Likes");
@@ -101,7 +115,7 @@ public class ProfileActivity extends AppCompatActivity {
         safemode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(CurrentState == "unsafemode"){
+                if(CurrentState.equals("unsafemode")){
                     FirebaseAuth.getInstance().signOut();
                     String newEmail = "newuser@example.com";
                     String newPassword = "password123";
@@ -141,6 +155,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                                             }
                                             CurrentState = "safemode";
+                                            editor.putString(CURRENT_STATE_KEY, "safemode");
+                                            editor.apply();
                                             Toast.makeText(ProfileActivity.this,CurrentState,Toast.LENGTH_SHORT).show();
                                             finish();
                                         } else {
@@ -157,16 +173,18 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     });
                 }
-                if(CurrentState == "safemode"){
+                if(CurrentState.equals("safemode")){
                     mUser.delete();
                     DatabaseReference mU = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
                     mU.removeValue();
                     // Chuyển người dùng đến màn hình SplashActivity
-                    Intent intent = new Intent(ProfileActivity.this, SplashActivity.class);
+                    Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     FirebaseAuth.getInstance().signOut();
                     CurrentState = "unsafemode";
+                    editor.putString(CURRENT_STATE_KEY, "unsafemode");
+                    editor.apply();
                     Toast.makeText(ProfileActivity.this,CurrentState,Toast.LENGTH_SHORT).show();
                 }
 
