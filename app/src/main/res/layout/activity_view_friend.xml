@@ -93,6 +93,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:srcCompat="@drawable/ic_add_friend_white" />
 
+            <ImageView
+                android:id="@+id/decline"
+                android:layout_width="31dp"
+                android:layout_height="31dp"
+                android:layout_marginTop="8dp"
+                app:layout_constraintEnd_toEndOf="@+id/addFriend"
+                app:layout_constraintStart_toStartOf="@+id/addFriend"
+                app:layout_constraintTop_toBottomOf="@+id/addFriend"
+                app:srcCompat="@drawable/decline_white" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

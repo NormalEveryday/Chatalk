@@ -36,6 +36,7 @@ public class FindFriendActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     Toolbar toolbar;
     RecyclerView recyclerView;
+    DatabaseReference friendRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,8 @@ public class FindFriendActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        friendRef = FirebaseDatabase.getInstance().getReference().child("Friends");
+
         LoadUser("");
 
     }
@@ -62,6 +65,7 @@ public class FindFriendActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Users model) {
                 if(!mUser.getUid().equals(getRef(position).getKey().toString())){
+
                     Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                     holder.username.setText(model.getUsername());
                     holder.email.setText(model.getEmail());

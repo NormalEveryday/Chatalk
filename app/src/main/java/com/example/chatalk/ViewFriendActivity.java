@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -36,7 +37,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ViewFriendActivity extends AppCompatActivity {
     CircleImageView userImage;
     TextView username,desc;
-    ImageView editprofile,addFriend;
+    ImageView editprofile,addFriend, decline;
 
     DatabaseReference mUserRef;
     FirebaseAuth mAuth;
@@ -60,9 +61,10 @@ public class ViewFriendActivity extends AppCompatActivity {
         userImage = findViewById(R.id.userImage);
         addFriend = findViewById(R.id.addFriend);
         recyclerView = findViewById(R.id.recyclerView);
+        decline = findViewById(R.id.decline);
         userID = getIntent().getStringExtra("userID");
 
-        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(userID);
+        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         PostRef = FirebaseDatabase.getInstance().getReference().child("Posts");
         //like child realtime db
@@ -71,7 +73,8 @@ public class ViewFriendActivity extends AppCompatActivity {
         CommentRef = FirebaseDatabase.getInstance().getReference().child("Comments");
         requestRef = FirebaseDatabase.getInstance().getReference().child("Requests");
         friendRef = FirebaseDatabase.getInstance().getReference().child("Friends");
-        mUserRef.addValueEventListener(new ValueEventListener() {
+
+        mUserRef.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 uname = snapshot.child("username").getValue().toString();
@@ -90,22 +93,125 @@ public class ViewFriendActivity extends AppCompatActivity {
             }
 
         });
-
+        if(CurrentState.equals("Friends")){
+            addFriend.setVisibility(View.GONE);
+        }
         addFriend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 PerformAction(userID);
-                addFriend.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        Toast.makeText(ViewFriendActivity.this,"Decline send!",Toast.LENGTH_SHORT).show();
-                    }
-                });
             }
         });
         LoadPost();
+        checkUserExistance(userID);
 
+        decline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Unfriend(userID);
+            }
+        });
+
+    }
+
+    private void Unfriend(String userID) {
+        if(CurrentState.equals("friend")){
+            friendRef.child(mUser.getUid()).child(userID).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(ViewFriendActivity.this,"Unfriend",Toast.LENGTH_SHORT).show();
+                        CurrentState = "nothing";
+                        addFriend.setImageResource(R.drawable.ic_add_friend_white);
+                        decline.setVisibility(View.GONE);
+                    }
+                }
+            });
+        }
+        if(CurrentState.equals("he_sent_pending")){
+            HashMap hashMap = new HashMap();
+            hashMap.put("status","decline");
+            requestRef.child(userID).child(mUser.getUid()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                @Override
+                public void onComplete(@NonNull Task task) {
+                    if(task.isSuccessful()){
+                        Toast.makeText(ViewFriendActivity.this,"Decline Friend",Toast.LENGTH_SHORT).show();
+                        CurrentState = "he_sent_decline";
+                        decline.setVisibility(View.GONE);
+                        addFriend.setVisibility(View.GONE);
+                    }
+                }
+            });
+
+        }
+    }
+
+    private void checkUserExistance(String userID) {
+        friendRef.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    CurrentState = "friend";
+                    addFriend.setImageResource(R.drawable.ic_chat_white);
+                    decline.setImageResource(R.drawable.decline_white);
+                    decline.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        requestRef.child(mUser.getUid()).child(userID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    if(snapshot.child("status").getValue().equals("pending")){
+                        CurrentState = "I_sent_pending";
+                        addFriend.setImageResource(R.drawable.cancel);
+                        decline.setVisibility(View.GONE);
+                    }
+                }
+                if(snapshot.exists()){
+                    if(snapshot.child("status").getValue().equals("decline")){
+                        CurrentState = "I_sent_decline";
+                        addFriend.setImageResource(R.drawable.cancel);
+                        decline.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        requestRef.child(userID).child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    if(snapshot.child("status").getValue().toString().equals("pending")){
+                        CurrentState = "he_sent_pending";
+                        addFriend.setImageResource(R.drawable.accept);
+                        decline.setImageResource(R.drawable.reject);
+                        decline.setVisibility(View.VISIBLE);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        if(CurrentState.equals("nothing")){
+            CurrentState = "nothing";
+            addFriend.setImageResource(R.drawable.ic_add_friend_white);
+            decline.setVisibility(View.VISIBLE);
+        }
     }
 
     private void PerformAction(String userID) {
@@ -117,8 +223,9 @@ public class ViewFriendActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task task) {
                     if(task.isSuccessful()){
                         Toast.makeText(ViewFriendActivity.this,"Request send!",Toast.LENGTH_SHORT).show();
+                        decline.setVisibility(View.GONE);
                         CurrentState = "I_sent_pending";
-
+                        addFriend.setImageResource(R.drawable.cancel);
                     }
                 }
             });
@@ -131,12 +238,14 @@ public class ViewFriendActivity extends AppCompatActivity {
                     if(task.isSuccessful()){
                         Toast.makeText(ViewFriendActivity.this,"Cancelled request send!",Toast.LENGTH_SHORT).show();
                         CurrentState = "nothing";
+                        addFriend.setImageResource(R.drawable.ic_add_friend_white);
+                        decline.setVisibility(View.GONE);
 
                     }
                 }
             });
         }
-        if(CurrentState.equals("he_send_pending")){
+        if(CurrentState.equals("he_sent_pending")){
             HashMap hashMap = new HashMap();
             hashMap.put("status","friend");
             hashMap.put("username",uname);
@@ -150,6 +259,9 @@ public class ViewFriendActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task task) {
                                 Toast.makeText(ViewFriendActivity.this,"Added Friend",Toast.LENGTH_SHORT).show();
                                 CurrentState = "friend";
+                                addFriend.setImageResource(R.drawable.ic_chat_white);
+                                decline.setVisibility(View.VISIBLE);
+                                decline.setImageResource(R.drawable.decline_white);
                             }
                         });
                     }
@@ -159,6 +271,10 @@ public class ViewFriendActivity extends AppCompatActivity {
         }
         if(CurrentState.equals("friend")){
             //
+            Intent intent = new Intent(ViewFriendActivity.this,ChatActivity.class);
+            intent.putExtra("OtherUserID",userID);
+            startActivity(intent);
+
         }
     }
 
