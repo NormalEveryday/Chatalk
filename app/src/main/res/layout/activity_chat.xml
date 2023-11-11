@@ -8,7 +8,7 @@
     tools:context=".ChatActivity">
 
     <include layout="@layout/app_bar_chat"
-        android:id="@+id/app_bar"/>
+        android:id="@+id/app_bar_chat"/>
     <androidx.recyclerview.widget.RecyclerView
         android:padding="10dp"
         android:layout_width="0dp"
@@ -16,7 +16,7 @@
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_chat" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
