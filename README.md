@@ -1,3 +1,6 @@
 # Chatalk
-Social media application
+## Social networking application
+
+
+
 
