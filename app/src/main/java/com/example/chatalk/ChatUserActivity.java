@@ -2,6 +2,7 @@ package com.example.chatalk;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,9 +12,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import androidx.appcompat.widget.Toolbar;
-
+import android.widget.TextView;
 
 import com.example.chatalk.Utills.Friends;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -25,7 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
-public class FriendActivity extends AppCompatActivity {
+public class ChatUserActivity extends AppCompatActivity {
 
     Toolbar toolbar;
 
@@ -37,22 +36,25 @@ public class FriendActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseUser mUser;
     DatabaseReference mRef;
+    TextView status;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_friend);
+        setContentView(R.layout.activity_chat_user);
 
         toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Friends");
+        getSupportActionBar().setTitle("Chats");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        status = findViewById(R.id.mess);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Friends");
+
 
         LoadFriend("");
 
@@ -64,7 +66,7 @@ public class FriendActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Friends model) {
                 holder.username.setText(model.getUsername());
-                holder.email.setText(model.getEmail());
+//                holder.email.setText(model.getEmail());
                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
 
                 //get user to chat
@@ -74,8 +76,8 @@ public class FriendActivity extends AppCompatActivity {
 //                        Intent intent = new Intent(FriendActivity.this,ChatActivity.class);
 //                        intent.putExtra("OtherUserID",getRef(position).getKey());
 //                        startActivity(intent);
-                        Intent intent = new Intent(FriendActivity.this, ViewFriendActivity.class);
-                        intent.putExtra("userID",getRef(position).getKey().toString());
+                        Intent intent = new Intent(ChatUserActivity.this, ChatActivity.class);
+                        intent.putExtra("OtherUserID",getRef(position).getKey().toString());
                         startActivity(intent);
                     }
                 });
@@ -84,8 +86,7 @@ public class FriendActivity extends AppCompatActivity {
             @NonNull
             @Override
             public FriendViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_view_friend,parent,false);
-
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_view_chat,parent,false);
                 return new FriendViewHolder(view);
             }
         };

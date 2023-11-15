@@ -53,20 +53,20 @@ public class ProfileActivity extends AppCompatActivity {
     FirebaseUser mUser;
     StorageReference StorageRef;
 
-    public static String CurrentState = "unsafemode";
+    public static String State = "unsafemode";
 
     public static SharedPreferences sharedPreferences;
     public static SharedPreferences.Editor editor;
 
 
     public static final String PREFERENCE_FILE_KEY = "com.example.chatalk.PREFERENCES";
-    public static final String CURRENT_STATE_KEY = "CurrentState";
+    public static final String CURRENT_STATE_KEY = "State";
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Toast.makeText(ProfileActivity.this,CurrentState,Toast.LENGTH_LONG).show();
+        Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_LONG).show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
@@ -89,7 +89,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences = getSharedPreferences(PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
-        CurrentState = sharedPreferences.getString(CURRENT_STATE_KEY, "unsafemode");
+        State = sharedPreferences.getString(CURRENT_STATE_KEY, "unsafemode");
+
+
         PostRef = FirebaseDatabase.getInstance().getReference().child("Posts");
         //like child realtime db
         LikeRef = FirebaseDatabase.getInstance().getReference().child("Likes");
@@ -115,7 +117,7 @@ public class ProfileActivity extends AppCompatActivity {
         safemode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(CurrentState.equals("unsafemode")){
+                if(State.equals("unsafemode")){
                     FirebaseAuth.getInstance().signOut();
                     String newEmail = "newuser@example.com";
                     String newPassword = "password123";
@@ -154,10 +156,10 @@ public class ProfileActivity extends AppCompatActivity {
                                                 startActivity(intent);
 
                                             }
-                                            CurrentState = "safemode";
+                                            State = "safemode";
                                             editor.putString(CURRENT_STATE_KEY, "safemode");
                                             editor.apply();
-                                            Toast.makeText(ProfileActivity.this,CurrentState,Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_SHORT).show();
                                             finish();
                                         } else {
 
@@ -173,7 +175,7 @@ public class ProfileActivity extends AppCompatActivity {
                         }
                     });
                 }
-                if(CurrentState.equals("safemode")){
+                if(State.equals("safemode")){
                     mUser.delete();
                     DatabaseReference mU = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
                     mU.removeValue();
@@ -182,10 +184,10 @@ public class ProfileActivity extends AppCompatActivity {
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     FirebaseAuth.getInstance().signOut();
-                    CurrentState = "unsafemode";
+                    State = "unsafemode";
                     editor.putString(CURRENT_STATE_KEY, "unsafemode");
                     editor.apply();
-                    Toast.makeText(ProfileActivity.this,CurrentState,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_SHORT).show();
                 }
 
 

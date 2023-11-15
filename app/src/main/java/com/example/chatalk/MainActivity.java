@@ -177,10 +177,11 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         }else if (item.getItemId() == R.id.findfriend) {
             startActivity(new Intent(MainActivity.this,FindFriendActivity.class));
         }else if (item.getItemId() == R.id.chat) {
+            startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
 
         }else if (item.getItemId() == R.id.logout) {
-            Toast.makeText(MainActivity.this,ProfileActivity.CurrentState,Toast.LENGTH_LONG).show();
-            if(ProfileActivity.CurrentState == "safemode"){
+            Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_LONG).show();
+            if(ProfileActivity.State == "safemode"){
                 mUser.delete();
                 DatabaseReference mU = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
                 mU.removeValue();
@@ -189,12 +190,12 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 FirebaseAuth.getInstance().signOut();
-                ProfileActivity.CurrentState = "unsafemode";
+                ProfileActivity.State = "unsafemode";
                 ProfileActivity.editor.putString(ProfileActivity.CURRENT_STATE_KEY, "unsafemode");
                 ProfileActivity.editor.apply();
-                Toast.makeText(MainActivity.this,ProfileActivity.CurrentState,Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
             }
-            if(ProfileActivity.CurrentState == "unsafemode"){
+            if(ProfileActivity.State == "unsafemode"){
                 mAuth.signOut();
                 startActivity(new Intent(MainActivity.this,SplashActivity.class));
             }
@@ -210,18 +211,24 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
+        if(item.getItemId() == R.id.chat){
+
+            startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
+            return true;
+        }
         return true;
 
     }
 
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.chat){
-            Toast.makeText(MainActivity.this,"chat",Toast.LENGTH_SHORT).show();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+//    @Override
+//    public boolean onContextItemSelected(@NonNull MenuItem item) {
+//        if(item.getItemId() == R.id.chat){
+//            Toast.makeText(MainActivity.this,"Chat here",Toast.LENGTH_SHORT).show();
+//            startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
+//            return true;
+//        }
+//        return true;
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -435,6 +442,9 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             startActivity(intent);
             finish();
         }else{
+
+            mRef.child(mUser.getUid()).child("status").setValue("online");
+
             mRef.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -462,6 +472,5 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             });
         }
     }
-
 
 }

@@ -10,6 +10,7 @@
     <include layout="@layout/app_bar_chat"
         android:id="@+id/app_bar_chat"/>
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
         android:padding="10dp"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -38,7 +39,6 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
-
             android:id="@+id/inputSms"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -46,12 +46,12 @@
             android:inputType="textMultiLine"
             android:padding="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/imageView4"
+            app:layout_constraintEnd_toStartOf="@+id/btnSend"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView4"
+            android:id="@+id/btnSend"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginEnd="8dp"

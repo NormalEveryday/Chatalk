@@ -5,6 +5,7 @@ public class Friends {
     private String username;
 
 
+    private String email;
     public String getEmail() {
         return email;
     }
@@ -13,7 +14,7 @@ public class Friends {
         this.email = email;
     }
 
-    private String email;
+
 
     public Friends(){}
 
