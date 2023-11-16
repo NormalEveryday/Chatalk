@@ -1,5 +1,5 @@
 # Chatalk
-## Social networking application
+Social networking Android application
 ## App Feature
   1.  Create your own account
   2.  Login if you already have an account/Logout
@@ -19,6 +19,7 @@
 ## Database
   Realtime database (firebase)\
   Java
+
 
 
 
