@@ -41,6 +41,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -127,6 +128,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         navigationView = findViewById(R.id.navView);
         commentImage = findViewById(R.id.commentsImage);
 
+
+
         addImagePost = findViewById(R.id.addImagePost);
         sendImagePost = findViewById(R.id.send_post_imageView);
         inputPostDesc = findViewById(R.id.inputAddPost);
@@ -137,6 +140,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         mUser = mAuth.getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
+        FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid());
 
 
         sendImagePost.setOnClickListener(new View.OnClickListener() {
@@ -180,6 +184,11 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
 
         }else if (item.getItemId() == R.id.logout) {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_LONG).show();
             if(ProfileActivity.State == "safemode"){
                 mUser.delete();

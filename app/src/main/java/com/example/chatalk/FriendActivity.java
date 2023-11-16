@@ -20,10 +20,16 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FriendActivity extends AppCompatActivity {
 
@@ -54,9 +60,71 @@ public class FriendActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Friends");
 
+        CheckFriendExist();
+
+
         LoadFriend("");
 
     }
+
+    private void CheckFriendExist() {
+        List<String> UserUID = new ArrayList<>();
+        DatabaseReference mUserRef = FirebaseDatabase.getInstance().getReference().child("Users");
+        mUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                        UserUID.add(dataSnapshot.getKey());
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        mRef.child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                    if(!UserUID.contains(dataSnapshot.getKey())){
+                        dataSnapshot.getRef().removeValue();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+//        mRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if(snapshot.exists()){
+//                    for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+//                        if(!UserUID.contains(dataSnapshot.getKey())){
+//                            dataSnapshot.getRef().removeValue();
+//                        }
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+
+
+
+    }
+
     public void  LoadFriend(String s){
         Query query = mRef.child(mUser.getUid()).orderByChild("username").startAt(s).endAt(s+"\uf8ff");
         options = new FirebaseRecyclerOptions.Builder<Friends>().setQuery(query, Friends.class).build();

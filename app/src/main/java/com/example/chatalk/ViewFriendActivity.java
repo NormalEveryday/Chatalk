@@ -295,7 +295,7 @@ public class ViewFriendActivity extends AppCompatActivity {
             ViewFriendActivity.editor.putString(CURRENT_STATE_KEY,"nothing");
             editor.apply();
             addFriend.setImageResource(R.drawable.ic_add_friend_white);
-            decline.setVisibility(View.VISIBLE);
+            decline.setVisibility(View.GONE);
         }
     }
 
