@@ -17,8 +17,7 @@ Social networking Android application
 ## Setting up
   Environment to develop Android (Android Studio)
 ## Database
-  Realtime database (firebase)\
-  Java
+  Realtime database (firebase)
 
 
 
