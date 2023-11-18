@@ -14,6 +14,7 @@ Social networking Android application
   11.  Notification messages come
   12.  Hidden mode (Logging with clone account)
   13.  Watch other user profile(include their post, email, desc)
+  14.  Search information by voice(Integrate PaLM)
 ## Setting up
   Environment to develop Android (Android Studio)
 ## Database
