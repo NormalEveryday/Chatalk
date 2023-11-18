@@ -1,9 +1,13 @@
 package com.example.chatalk;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+import android.graphics.drawable.Animatable;
+import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,8 +17,14 @@ import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
+import android.util.JsonReader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +36,20 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
+import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Posts;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -47,14 +71,30 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity  extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     Toolbar toolbar;
+
+    //Chatbot
+    private String stringAPIKey = "AIzaSyDmod61h5FHXa-9v368ZJ1GtjkWhCWeGc8";
+    private String stringURLEndPoint = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key="+stringAPIKey;
+    private String stringOutput = "";
+
+    private TextToSpeech textToSpeech;
+
+    private SpeechRecognizer speechRecognizer;
+    private Intent intent;
+
 
     DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -90,6 +130,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 //    SharedPreferences sharedPreferences;
 //    SharedPreferences.Editor editor;
 
+
     public MainActivity() {
     }
 
@@ -97,6 +138,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
 
 
         toolbar = findViewById(R.id.app_bar);
@@ -143,6 +185,78 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid());
 
 
+
+        //set up for gpt
+        ActivityCompat.requestPermissions(this,
+                new String[]{RECORD_AUDIO},
+                PackageManager.PERMISSION_GRANTED);
+
+
+//        textView = findViewById(R.id.textViewgpt);
+//        editText = findViewById(R.id.editTextgpt);
+
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                textToSpeech.setSpeechRate((float) 0.8);
+            }
+        });
+
+
+        intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+            }
+
+            @Override
+            public void onRmsChanged(float v) {
+            }
+
+            @Override
+            public void onBufferReceived(byte[] bytes) {
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+            }
+
+            @Override
+            public void onError(int i) {
+            }
+
+            @Override
+            public void onResults(Bundle bundle) {
+                ArrayList<String> matches = bundle.getStringArrayList(speechRecognizer.RESULTS_RECOGNITION);
+                String string = "";
+//                textView.setText("");
+                if (matches != null) {
+                    string = matches.get(0);
+//                    editText.setText(string);
+                    chatGPTModel(string);
+                }
+            }
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
+            }
+
+            @Override
+            public void onEvent(int i, Bundle bundle) {
+            }
+        });
+        /// end
+
+
         sendImagePost.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -176,25 +290,53 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         }else if (item.getItemId() == R.id.profile) {
             startActivity(new Intent(MainActivity.this,ProfileActivity.class));
         }else if (item.getItemId() == R.id.friendlist) {
-            startActivity(new Intent(MainActivity.this, FriendActivity.class));
+
+            if(ProfileActivity.State == "safemode"){
+                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
+            }else {
+
+                startActivity(new Intent(MainActivity.this, FriendActivity.class));
+            }
 
         }else if (item.getItemId() == R.id.findfriend) {
-            startActivity(new Intent(MainActivity.this,FindFriendActivity.class));
+            if(ProfileActivity.State == "safemode"){
+                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
+            }else {
+                startActivity(new Intent(MainActivity.this,FindFriendActivity.class));
+            }
+
         }else if (item.getItemId() == R.id.chat) {
-            startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
+            if(ProfileActivity.State == "safemode"){
+                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
+            }else {
+                startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
+            }
+
 
         }else if (item.getItemId() == R.id.logout) {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+
             Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_LONG).show();
-            if(ProfileActivity.State == "safemode"){
+            if(ProfileActivity.State.equals("safemode")){
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid()).removeValue();
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 mUser.delete();
-                DatabaseReference mU = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
-                mU.removeValue();
-                // Chuyển người dùng đến màn hình SplashActivity
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+//                mAuth.signOut();
+
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -204,7 +346,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 ProfileActivity.editor.apply();
                 Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
             }
-            if(ProfileActivity.State == "unsafemode"){
+            if(ProfileActivity.State.equals("unsafemode")){
                 mAuth.signOut();
                 startActivity(new Intent(MainActivity.this,SplashActivity.class));
             }
@@ -221,28 +363,106 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             return true;
         }
         if(item.getItemId() == R.id.chat){
+            if(ProfileActivity.State=="safemode"){
+                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
+            }else {
+                startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
 
-            startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
+            }
+
+
             return true;
+        }
+        if(item.getItemId() == R.id.assistance){
+//            startActivity(new Intent(MainActivity.this,ChatgptActivity.class));
+            if (textToSpeech.isSpeaking()){
+                textToSpeech.stop();
+//                return true;
+            }
+            stringOutput = "";
+            speechRecognizer.startListening(intent);
+
         }
         return true;
 
     }
 
-//    @Override
-//    public boolean onContextItemSelected(@NonNull MenuItem item) {
-//        if(item.getItemId() == R.id.chat){
-//            Toast.makeText(MainActivity.this,"Chat here",Toast.LENGTH_SHORT).show();
-//            startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
-//            return true;
-//        }
-//        return true;
-//    }
+    private void chatGPTModel(String input){
+
+
+        JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObjectText = new JSONObject();
+        try {
+            jsonObjectText.put("text", input + "short answer");
+            jsonObject.put("prompt", jsonObjectText);
+
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+                stringURLEndPoint,
+                jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String stringOutput = response.getJSONArray("candidates")
+                                    .getJSONObject(0)
+                                    .getString("output");
+
+//                            textView.setText(stringOutput);
+                            //say it
+                            textToSpeech.speak(stringOutput, TextToSpeech.QUEUE_FLUSH, null,null);
+                        } catch (JSONException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+//                textView.setText("Error");
+                Toast.makeText(MainActivity.this,"Error",Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> mapHeader = new HashMap<>();
+                mapHeader.put("Content-Type", "application/json");
+                return mapHeader;
+            }
+        };
+        int intTimeoutPeriod = 60000; //60 seconds
+        RetryPolicy retryPolicy = new DefaultRetryPolicy(intTimeoutPeriod,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+
+        jsonObjectRequest.setRetryPolicy(retryPolicy);
+        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
+    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.main_menu,menu);
         MenuItem searchIcon = menu.findItem(R.id.search_bar);
+
+        MenuItem item = menu.findItem(R.id.assistance);
+
+        Glide.with(this).asGif().load(R.drawable.box).into(new CustomTarget<GifDrawable>() {
+            @Override
+            public void onResourceReady(@NonNull GifDrawable resource, @Nullable Transition<? super GifDrawable> transition) {
+                item.setIcon(resource);
+                resource.start();
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+            }
+        });
 
         SearchView searchBar = (SearchView)searchIcon.getActionView();
 
@@ -374,6 +594,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     }
 
 
+
+
     private void AddPost() {
         String desc = inputPostDesc.getText().toString();
         if(desc.isEmpty() || desc.length()<3){
@@ -480,6 +702,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 }
             });
         }
-    }
 
+
+    }
 }

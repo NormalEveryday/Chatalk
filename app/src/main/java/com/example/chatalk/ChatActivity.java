@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Chat;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -143,6 +145,8 @@ public class ChatActivity extends AppCompatActivity {
                     holder.secondUserProfile.setVisibility(View.VISIBLE);
                     holder.secondUserText.setVisibility(View.VISIBLE);
 
+
+
                     holder.secondUserText.setText(model.getSms());
                     Picasso.get().load(myProfileImageLink).into(holder.secondUserProfile);
 
@@ -151,6 +155,8 @@ public class ChatActivity extends AppCompatActivity {
                     holder.firstUserProfile.setVisibility(View.VISIBLE);
                     holder.secondUserProfile.setVisibility(View.GONE);
                     holder.secondUserText.setVisibility(View.GONE);
+
+
 
                     holder.firstUserText.setText(model.getSms());
                     Picasso.get().load(OtherProfileImageLink).into(holder.firstUserProfile);
@@ -183,7 +189,6 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task task) {
                             if(task.isSuccessful()){
-
                                 sendNotification(sms);
                                 inputSms.setText("");
                             }
@@ -243,7 +248,6 @@ public class ChatActivity extends AppCompatActivity {
                 usernameAppbar.setText(OtherUsername);
                 status.setText(OtherUserStatus);
 
-
             }
 
             @Override
@@ -253,13 +257,6 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        if(mUser!=null){
-//            mUserRef.child(mUser.getUid()).child("status").setValue("online");
-//        }
-//    }
 
     @Override
     protected void onPause() {
@@ -272,9 +269,28 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        Date date = new Date();
+        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+        final String strDate = formatter.format(date);
+        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
+        super.onStop();
+    }
+
+    @Override
     protected void onStart() {
         mUserRef.child(mUser.getUid()).child("status").setValue("online");
         super.onStart();
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        Date date = new Date();
+        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+        final String strDate = formatter.format(date);
+        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
+        super.onDestroy();
     }
 
     @Override

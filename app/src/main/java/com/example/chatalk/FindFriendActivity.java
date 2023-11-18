@@ -69,6 +69,7 @@ public class FindFriendActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         friendRef = FirebaseDatabase.getInstance().getReference().child("Friends");
+
         requestRecyclerView = findViewById(R.id.requestRecycler);
         titleRequest = findViewById(R.id.titleRequest);
         requestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -98,10 +99,11 @@ public class FindFriendActivity extends AppCompatActivity {
                                     if(!mUser.getUid().equals(getRef(position).getKey().toString())
                                             && key.equals(getRef(position).getKey())
                                             && myKey.equals(mUser.getUid())){
-                                        titleRequest.setVisibility(View.VISIBLE);
+
                                         Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                         holder.username.setText(model.getUsername());
                                         holder.email.setText(model.getEmail());
+
                                     }else {
                                         holder.itemView.setVisibility(View.GONE);
                                         holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0,0));
@@ -165,12 +167,15 @@ public class FindFriendActivity extends AppCompatActivity {
                     for(DataSnapshot friendDataSnapshot: snapshot.getChildren()){
                         friendUID.add(friendDataSnapshot.getKey());
                     }
+
                     options = new FirebaseRecyclerOptions.Builder<Users>().setQuery(query,Users.class).build();
                     adapter = new FirebaseRecyclerAdapter<Users, FindFriendViewHolder>(options) {
                         @Override
                         protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Users model) {
 
-                            if(!mUser.getUid().equals(getRef(position).getKey().toString()) && !friendUID.contains(getRef(position).getKey())){
+                            if(!mUser.getUid().equals(getRef(position).getKey().toString())
+                                    && !friendUID.contains(getRef(position).getKey())
+                                    && !model.getEmail().equals("")){
 
                                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                 holder.username.setText(model.getUsername());
@@ -205,8 +210,6 @@ public class FindFriendActivity extends AppCompatActivity {
                             return new FindFriendViewHolder(view);
                         }
                     };
-                    adapter.startListening();
-                    recyclerView.setAdapter(adapter);
 
                 }else {
                     options = new FirebaseRecyclerOptions.Builder<Users>().setQuery(query,Users.class).build();
@@ -214,7 +217,8 @@ public class FindFriendActivity extends AppCompatActivity {
                         @Override
                         protected void onBindViewHolder(@NonNull FindFriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Users model) {
 
-                            if(!mUser.getUid().equals(getRef(position).getKey().toString())){
+                            if(!mUser.getUid().equals(getRef(position).getKey().toString())
+                                    && !model.getEmail().equals("")){
 
                                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                 holder.username.setText(model.getUsername());
@@ -249,9 +253,9 @@ public class FindFriendActivity extends AppCompatActivity {
                             return new FindFriendViewHolder(view);
                         }
                     };
-                    adapter.startListening();
-                    recyclerView.setAdapter(adapter);
                 }
+                adapter.startListening();
+                recyclerView.setAdapter(adapter);
             }
 
             @Override

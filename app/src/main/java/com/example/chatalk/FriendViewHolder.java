@@ -11,12 +11,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FriendViewHolder extends RecyclerView.ViewHolder {
     CircleImageView profileImage;
-    TextView email,username;
+    TextView email,username,mess;
     public FriendViewHolder(@NonNull View itemView) {
         super(itemView);
         profileImage = itemView.findViewById(R.id.profileImage);
         email = itemView.findViewById(R.id.email);
         username = itemView.findViewById(R.id.userNam);
+
 
     }
 }

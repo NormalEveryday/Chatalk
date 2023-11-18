@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import androidx.appcompat.widget.Toolbar;
 
 
+import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Friends;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;

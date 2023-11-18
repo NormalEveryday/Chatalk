@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Friends;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -66,8 +67,9 @@ public class ChatUserActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Friends model) {
                 holder.username.setText(model.getUsername());
-//                holder.email.setText(model.getEmail());
+//                holder.email.setText("Hello");
                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
+//                status.setText(getIntent().getStringExtra("newestSMS"));
 
                 //get user to chat
                 holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Posts;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -82,6 +83,11 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(ProfileActivity.this, editProfileActivity.class));
+                if(State == "safemode"){
+                    Toast.makeText(ProfileActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
+                }else {
+                    startActivity(new Intent(ProfileActivity.this, editProfileActivity.class));
+                }
             }
         });
 
@@ -176,18 +182,34 @@ public class ProfileActivity extends AppCompatActivity {
                     });
                 }
                 if(State.equals("safemode")){
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid()).removeValue();
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                     mUser.delete();
-                    DatabaseReference mU = FirebaseDatabase.getInstance().getReference("Users").child(mUser.getUid());
-                    mU.removeValue();
-                    // Chuyển người dùng đến màn hình SplashActivity
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+//                mAuth.signOut();
+
                     Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                     FirebaseAuth.getInstance().signOut();
                     State = "unsafemode";
-                    editor.putString(CURRENT_STATE_KEY, "unsafemode");
+                    editor.putString(ProfileActivity.CURRENT_STATE_KEY, "unsafemode");
                     editor.apply();
-                    Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
                 }
 
 
