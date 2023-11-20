@@ -1,8 +1,10 @@
 package com.example.chatalk;
 
 import static android.Manifest.permission.RECORD_AUDIO;
+
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -82,12 +84,12 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class MainActivity  extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     Toolbar toolbar;
 
     //Chatbot
     private String stringAPIKey = "AIzaSyDmod61h5FHXa-9v368ZJ1GtjkWhCWeGc8";
-    private String stringURLEndPoint = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key="+stringAPIKey;
+    private String stringURLEndPoint = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=" + stringAPIKey;
     private String stringOutput = "";
 
     private TextToSpeech textToSpeech;
@@ -99,19 +101,19 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     DrawerLayout drawerLayout;
     NavigationView navigationView;
 
-    CircleImageView image_profile,profileImageHeader;
+    CircleImageView image_profile, profileImageHeader;
 
-    TextView usernameHeader,emailHeader;
+    TextView usernameHeader, emailHeader;
 
     String imageurl;
 
     FirebaseAuth mAuth;
     FirebaseUser mUser;
-    DatabaseReference mRef,PostRef,LikeRef,CommentRef;
+    DatabaseReference mRef, PostRef, LikeRef, CommentRef;
     StorageReference mStore;
     EditText inputPostDesc;
 
-    ImageView addImagePost,sendImagePost, commentImage;
+    ImageView addImagePost, sendImagePost, commentImage;
 
     private static final int REQUEST_CODE = 101;
     ImageView sendComment;
@@ -120,12 +122,12 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     ProgressDialog progressDialog;
     StorageReference postImageRef;
-    public static FirebaseRecyclerAdapter<Posts,MyHolder> adapter;
+    public static FirebaseRecyclerAdapter<Posts, MyHolder> adapter;
     public static FirebaseRecyclerOptions<Posts> options;
     RecyclerView recyclerView;
 
 
-    String usernameView,profileImageUrlView;
+    String usernameView, profileImageUrlView;
 
 //    SharedPreferences sharedPreferences;
 //    SharedPreferences.Editor editor;
@@ -138,7 +140,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_SHORT).show();
 
 
         toolbar = findViewById(R.id.app_bar);
@@ -171,7 +173,6 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         commentImage = findViewById(R.id.commentsImage);
 
 
-
         addImagePost = findViewById(R.id.addImagePost);
         sendImagePost = findViewById(R.id.send_post_imageView);
         inputPostDesc = findViewById(R.id.inputAddPost);
@@ -183,7 +184,6 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
 
         FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid());
-
 
 
         //set up for gpt
@@ -269,7 +269,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             public void onClick(View view) {
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                startActivityForResult(intent,REQUEST_CODE);
+                startActivityForResult(intent, REQUEST_CODE);
             }
         });
 
@@ -285,38 +285,29 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.home){
-            startActivity(new Intent(MainActivity.this,MainActivity.class));
-        }else if (item.getItemId() == R.id.profile) {
-            startActivity(new Intent(MainActivity.this,ProfileActivity.class));
-        }else if (item.getItemId() == R.id.friendlist) {
+        if (item.getItemId() == R.id.home) {
+            startActivity(new Intent(MainActivity.this, MainActivity.class));
+        } else if (item.getItemId() == R.id.profile) {
+            startActivity(new Intent(MainActivity.this, ProfileActivity.class));
+        } else if (item.getItemId() == R.id.friendlist) {
 
-            if(ProfileActivity.State == "safemode"){
-                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
-            }else {
+            if (ProfileActivity.State == "safemode") {
+                Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
+            } else {
 
                 startActivity(new Intent(MainActivity.this, FriendActivity.class));
             }
 
-        }else if (item.getItemId() == R.id.findfriend) {
-            if(ProfileActivity.State == "safemode"){
-                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
-            }else {
-                startActivity(new Intent(MainActivity.this,FindFriendActivity.class));
+        } else if (item.getItemId() == R.id.findfriend) {
+            if (ProfileActivity.State == "safemode") {
+                Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
+            } else {
+                startActivity(new Intent(MainActivity.this, FindFriendActivity.class));
             }
 
-        }else if (item.getItemId() == R.id.chat) {
-            if(ProfileActivity.State == "safemode"){
-                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
-            }else {
-                startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
-            }
-
-
-        }else if (item.getItemId() == R.id.logout) {
-
-            Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_LONG).show();
-            if(ProfileActivity.State.equals("safemode")){
+        } else if (item.getItemId() == R.id.logout) {
+            Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_LONG).show();
+            if (ProfileActivity.State.equals("safemode")) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -335,7 +326,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-//                mAuth.signOut();
+                //                mAuth.signOut();
 
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -344,38 +335,34 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 ProfileActivity.State = "unsafemode";
                 ProfileActivity.editor.putString(ProfileActivity.CURRENT_STATE_KEY, "unsafemode");
                 ProfileActivity.editor.apply();
-                Toast.makeText(MainActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_SHORT).show();
             }
-            if(ProfileActivity.State.equals("unsafemode")){
+            if (ProfileActivity.State.equals("unsafemode")) {
                 mAuth.signOut();
-                startActivity(new Intent(MainActivity.this,SplashActivity.class));
+                startActivity(new Intent(MainActivity.this, SplashActivity.class));
             }
-
-            finish();
         }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId()==android.R.id.home){
+        if (item.getItemId() == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START);
             return true;
         }
-        if(item.getItemId() == R.id.chat){
-            if(ProfileActivity.State=="safemode"){
-                Toast.makeText(MainActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
-            }else {
-                startActivity(new Intent(MainActivity.this,ChatUserActivity.class));
-
+        if (item.getItemId() == R.id.chat) {
+            if (ProfileActivity.State == "safemode") {
+                Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
+            } else {
+                startActivity(new Intent(MainActivity.this, ChatUserActivity.class));
             }
-
 
             return true;
         }
-        if(item.getItemId() == R.id.assistance){
+        if (item.getItemId() == R.id.assistance) {
 //            startActivity(new Intent(MainActivity.this,ChatgptActivity.class));
-            if (textToSpeech.isSpeaking()){
+            if (textToSpeech.isSpeaking()) {
                 textToSpeech.stop();
 //                return true;
             }
@@ -387,7 +374,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     }
 
-    private void chatGPTModel(String input){
+    private void chatGPTModel(String input) {
 
 
         JSONObject jsonObject = new JSONObject();
@@ -412,7 +399,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
 //                            textView.setText(stringOutput);
                             //say it
-                            textToSpeech.speak(stringOutput, TextToSpeech.QUEUE_FLUSH, null,null);
+                            textToSpeech.speak(stringOutput, TextToSpeech.QUEUE_FLUSH, null, null);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
@@ -422,9 +409,9 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             @Override
             public void onErrorResponse(VolleyError error) {
 //                textView.setText("Error");
-                Toast.makeText(MainActivity.this,"Error",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
             }
-        }){
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> mapHeader = new HashMap<>();
@@ -442,11 +429,10 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     }
 
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        getMenuInflater().inflate(R.menu.main_menu,menu);
+        getMenuInflater().inflate(R.menu.main_menu, menu);
         MenuItem searchIcon = menu.findItem(R.id.search_bar);
 
         MenuItem item = menu.findItem(R.id.assistance);
@@ -464,10 +450,10 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        SearchView searchBar = (SearchView)searchIcon.getActionView();
+        SearchView searchBar = (SearchView) searchIcon.getActionView();
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        if(searchManager != null){
+        if (searchManager != null) {
             searchBar.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         }
 
@@ -481,10 +467,9 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             }
 
 
-
             @Override
             public boolean onQueryTextChange(String s) {
-                if(s.isEmpty()){
+                if (s.isEmpty()) {
 
                 }
                 return true;
@@ -495,11 +480,10 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     }
 
 
-
     private void LoadPost() {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
         Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("datePost");
-        options = new FirebaseRecyclerOptions.Builder<Posts>().setQuery(query,Posts.class).build();
+        options = new FirebaseRecyclerOptions.Builder<Posts>().setQuery(query, Posts.class).build();
         adapter = new FirebaseRecyclerAdapter<Posts, MyHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull MyHolder holder, int position, @NonNull Posts model) {
@@ -510,24 +494,8 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
 
-//                mRef.child(model.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                        holder.username.setText(snapshot.child("username").getValue().toString());
-//                        imageurl = snapshot.child("profileImage").getValue().toString();
-//                        Picasso.get().load(snapshot.child("profileImage").getValue().toString()).into(holder.userProfileImage);
-//                        Log.d("DEBUG","user:"+snapshot.child("profileImage").getValue().toString());
-//                 ;
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(@NonNull DatabaseError error) {
-//
-//                    }
-//                });
 
-
-                holder.countLikes(postKey,mUser.getUid(),LikeRef);
+                holder.countLikes(postKey, mUser.getUid(), LikeRef);
                 CommentRef = FirebaseDatabase.getInstance().getReference("Comments").child(postKey);
 
                 holder.CountComment(CommentRef);
@@ -537,12 +505,12 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                         LikeRef.child(postKey).child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if(snapshot.exists()){
+                                if (snapshot.exists()) {
                                     LikeRef.child(postKey).child(mUser.getUid()).removeValue();
                                     //Change color here
                                     holder.likeImage.setImageResource(R.drawable.ic_thumb_up_foreground);
                                     notifyDataSetChanged();
-                                }else {
+                                } else {
                                     LikeRef.child(postKey).child(mUser.getUid()).setValue("like");
                                     //Change color here
                                     holder.likeImage.setImageResource(R.drawable.ic_thumb_up_blue);
@@ -552,7 +520,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(MainActivity.this,error.toString(),Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
@@ -561,15 +529,15 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
                 holder.commentsImage.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent intent = new Intent(MainActivity.this,CommentActivity.class);
-                        intent.putExtra("username",holder.username.getText().toString());
+                        Intent intent = new Intent(MainActivity.this, CommentActivity.class);
+                        intent.putExtra("username", holder.username.getText().toString());
                         intent.putExtra("image_profile", model.getUserProfileImage());
-                        intent.putExtra("timeAgo",model.getDatePost());
-                        intent.putExtra("postDesc",model.getPostDesc());
-                        intent.putExtra("PostImageUrl",model.getPostImageUrl());
-                        intent.putExtra("postKey",postKey);
-                        intent.putExtra("datePost",model.getDatePost());
-                        intent.putExtra("postKey",postKey);
+                        intent.putExtra("timeAgo", model.getDatePost());
+                        intent.putExtra("postDesc", model.getPostDesc());
+                        intent.putExtra("PostImageUrl", model.getPostImageUrl());
+                        intent.putExtra("postKey", postKey);
+                        intent.putExtra("datePost", model.getDatePost());
+                        intent.putExtra("postKey", postKey);
                         startActivity(intent);
 
                     }
@@ -581,7 +549,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
             @NonNull
             @Override
             public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_post,parent,false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_post, parent, false);
 
                 return new MyHolder(view);
             }
@@ -594,61 +562,58 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     }
 
 
-
-
     private void AddPost() {
         String desc = inputPostDesc.getText().toString();
-        if(desc.isEmpty() || desc.length()<3){
+        if (desc.isEmpty() || desc.length() < 3) {
             inputPostDesc.setError("Fill the field");
-        }else if(imageuri==null){
-            Toast.makeText(MainActivity.this,"Add image please",Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else if (imageuri == null) {
+            Toast.makeText(MainActivity.this, "Add image please", Toast.LENGTH_SHORT).show();
+        } else {
             progressDialog.setTitle("Adding Post");
             progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
 
             Date date = new Date();
-            SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+            SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
             final String strDate = formatter.format(date);
 
-            postImageRef.child(mUser.getUid()+strDate).putFile(imageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            postImageRef.child(mUser.getUid() + strDate).putFile(imageuri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if(task.isSuccessful()){
-                        postImageRef.child(mUser.getUid()+strDate).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    if (task.isSuccessful()) {
+                        postImageRef.child(mUser.getUid() + strDate).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
                                 HashMap hashMap = new HashMap();
-                                hashMap.put("datePost",strDate);
-                                hashMap.put("postImageUrl",uri.toString());
-                                hashMap.put("postDesc",desc);
-                                hashMap.put("userProfileImage",profileImageUrlView);
-                                hashMap.put("username",usernameView);
-                                hashMap.put("uid",mUser.getUid());
-                                PostRef.child(mUser.getUid()+strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                                hashMap.put("datePost", strDate);
+                                hashMap.put("postImageUrl", uri.toString());
+                                hashMap.put("postDesc", desc);
+                                hashMap.put("userProfileImage", profileImageUrlView);
+                                hashMap.put("username", usernameView);
+                                hashMap.put("uid", mUser.getUid());
+                                PostRef.child(mUser.getUid() + strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
                                     public void onComplete(@NonNull Task task) {
-                                        if(task.isSuccessful()){
+                                        if (task.isSuccessful()) {
                                             progressDialog.dismiss();
 
-                                            Toast.makeText(MainActivity.this,"Post success",Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, "Post success", Toast.LENGTH_SHORT).show();
                                             addImagePost.setImageResource(R.drawable.ic_add_photo);
                                             inputPostDesc.setText("");
 
 
-                                        }else {
+                                        } else {
                                             progressDialog.dismiss();
-                                            Toast.makeText(MainActivity.this,"Post failed",Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(MainActivity.this, "Post failed", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
 
                             }
                         });
-                    }else {
+                    } else {
                         progressDialog.dismiss();
-                        Toast.makeText(MainActivity.this,"Error: "+task.getException(),Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Error: " + task.getException(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -659,7 +624,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE && resultCode== RESULT_OK && data != null){
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             imageuri = data.getData();
             addImagePost.setImageURI(imageuri);
         }
@@ -668,28 +633,30 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onStart() {
         super.onStart();
-        if(mUser == null){
-            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+        if (mUser == null) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
-        }else{
+        } else {
 
             mRef.child(mUser.getUid()).child("status").setValue("online");
 
             mRef.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
+                    if (snapshot.exists()) {
                         profileImageUrlView = snapshot.child("profileImage").getValue().toString();
                         usernameView = snapshot.child("username").getValue().toString();
 
-                        if(profileImageUrlView!=null){
+                        if (profileImageUrlView != null) {
                             Picasso.get().load(profileImageUrlView).into(profileImageHeader);
                             Picasso.get().load(profileImageUrlView).into(image_profile);
 
                         }
-                        if(usernameView !=null){usernameHeader.setText(usernameView);}
-                        if(emailHeader!=null){
+                        if (usernameView != null) {
+                            usernameHeader.setText(usernameView);
+                        }
+                        if (emailHeader != null) {
                             emailHeader.setText(mUser.getEmail());
                         }
 
@@ -698,7 +665,7 @@ public class MainActivity  extends AppCompatActivity implements NavigationView.O
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(MainActivity.this,"Error Header",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Error Header", Toast.LENGTH_SHORT).show();
                 }
             });
         }

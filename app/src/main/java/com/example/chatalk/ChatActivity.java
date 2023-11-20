@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.android.volley.AuthFailureError;
@@ -28,6 +29,7 @@ import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Chat;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.datatransport.runtime.scheduling.jobscheduling.SchedulerConfig;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -85,6 +87,7 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
 
 
         OtherUserID = getIntent().getStringExtra("OtherUserID");
@@ -268,14 +271,14 @@ public class ChatActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onStop() {
-        Date date = new Date();
-        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-        final String strDate = formatter.format(date);
-        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-        super.onStop();
-    }
+//    @Override
+//    protected void onStop() {
+//        Date date = new Date();
+//        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+//        final String strDate = formatter.format(date);
+//        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
+//        super.onStop();
+//    }
 
     @Override
     protected void onStart() {
@@ -284,18 +287,24 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onDestroy() {
-        Date date = new Date();
-        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-        final String strDate = formatter.format(date);
-        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-        super.onDestroy();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        Date date = new Date();
+//        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+//        final String strDate = formatter.format(date);
+//        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
+//        super.onDestroy();
+//    }
+
+//    @Override
+//    protected void onResume() {
+//        mUserRef.child(mUser.getUid()).child("status").setValue("online");
+//        super.onResume();
+//    }
+
 
     @Override
-    protected void onResume() {
-        mUserRef.child(mUser.getUid()).child("status").setValue("online");
-        super.onResume();
+    public void onBackPressed() {
+        finish();
     }
 }

@@ -34,6 +34,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:textColor="#000"
                 android:id="@+id/userNam"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -45,6 +46,7 @@
                 app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
             <TextView
+                android:textColor="#000"
                 android:id="@+id/mess"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

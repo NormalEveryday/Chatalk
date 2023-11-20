@@ -125,7 +125,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/commentsImage" />
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView2"
-                android:layout_width="0dp"
+                android:layout_width="0sp"
                 android:layout_height="match_parent"
                 app:layout_constraintEnd_toEndOf="@+id/view"
                 app:layout_constraintStart_toStartOf="@+id/view"
@@ -133,13 +133,14 @@
 
 
             <EditText
+                android:textColor="#000"
                 android:id="@+id/inputComment"
-                android:layout_width="0dp"
+                android:layout_width="0sp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="8sp"
                 android:ems="10"
                 android:inputType="text"
-                android:padding="5dp"
+                android:padding="5sp"
                 android:background="@drawable/conor_text_input"
                 android:text="Comment here"
                 app:layout_constraintEnd_toEndOf="@+id/recyclerView2"
@@ -159,9 +160,9 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/avatar"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
-                android:layout_marginBottom="4dp"
+                android:layout_width="36sp"
+                android:layout_height="36sp"
+                android:layout_marginBottom="4sp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/inputComment"
                 app:layout_constraintStart_toStartOf="parent"

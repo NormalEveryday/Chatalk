@@ -18,6 +18,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:paddingLeft="8dp"
+        android:textColor="#000"
         android:id="@+id/usernameTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -28,6 +30,8 @@
         app:layout_constraintTop_toTopOf="@+id/profile" />
 
     <TextView
+        android:paddingLeft="8dp"
+        android:textColor="#000"
         android:id="@+id/commentTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

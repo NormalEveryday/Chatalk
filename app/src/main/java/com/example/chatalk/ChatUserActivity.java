@@ -47,7 +47,7 @@ public class ChatUserActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Chats");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         status = findViewById(R.id.mess);
         recyclerView = findViewById(R.id.recyclerView);
@@ -75,9 +75,6 @@ public class ChatUserActivity extends AppCompatActivity {
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-//                        Intent intent = new Intent(FriendActivity.this,ChatActivity.class);
-//                        intent.putExtra("OtherUserID",getRef(position).getKey());
-//                        startActivity(intent);
                         Intent intent = new Intent(ChatUserActivity.this, ChatActivity.class);
                         intent.putExtra("OtherUserID",getRef(position).getKey().toString());
                         startActivity(intent);
@@ -96,4 +93,5 @@ public class ChatUserActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
     }
+
 }

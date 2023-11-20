@@ -24,6 +24,7 @@
         android:background="@drawable/conor_text_input"
         android:padding="8dp"
         android:text="Hello World"
+        android:textColor="#000"
         app:layout_constraintBottom_toBottomOf="@+id/firstUserProfile"
         app:layout_constraintEnd_toStartOf="@+id/secondUserProfile"
         app:layout_constraintHorizontal_bias="0.0"
@@ -43,6 +44,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:textColor="#000"
         android:id="@+id/secondUserText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
