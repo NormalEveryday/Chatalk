@@ -126,7 +126,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if(State.equals("unsafemode")){
                     FirebaseAuth.getInstance().signOut();
                     String newEmail = "newuser@example.com";
-                    String newPassword = "password123";
+                    String newPassword = String.valueOf(System.currentTimeMillis());
 
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                     firebaseAuth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -139,7 +139,7 @@ public class ProfileActivity extends AppCompatActivity {
                                 DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid());
 
                                 HashMap hashMap = new HashMap();
-                                hashMap.put("username", String.valueOf(System.currentTimeMillis()));
+                                hashMap.put("username", "Hidden User");
                                 hashMap.put("email", "");
                                 hashMap.put("description", "");
                                 hashMap.put("profileImage", "https://firebasestorage.googleapis.com/v0/b/chatalk-75a17.appspot.com/o/ProfileImages%2Fhidden.jpeg?alt=media&token=2d946df3-1c07-4146-a47d-c75fc205a779&_gl=1*le5h5n*_ga*Njc3OTAwOTQwLjE2OTc2NDQxNzA.*_ga_CW55HF8NVT*MTY5OTM4MDkzNy45My4xLjE2OTkzODM0NjguMjkuMC4w");
