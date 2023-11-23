@@ -356,6 +356,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
             } else {
                 startActivity(new Intent(MainActivity.this, ChatUserActivity.class));
+                finish();
             }
 
             return true;
@@ -671,5 +672,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        onStop();
     }
 }

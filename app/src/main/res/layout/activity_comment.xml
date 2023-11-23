@@ -145,15 +145,25 @@
                 app:layout_constraintVertical_bias="1.0"
                 android:layout_marginTop="100dp"
                 android:id="@+id/cardViewComment">
+
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#d9d9d9">
+                    >
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/avatar"
+                        android:layout_width="43dp"
+                        android:layout_height="43dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:srcCompat="@tools:sample/avatars" />
 
                     <EditText
                         android:id="@+id/inputComment"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
                         android:background="@drawable/conor_text_input"
                         android:ems="10"
                         android:hint="Comment here"
@@ -162,8 +172,10 @@
                         android:textColor="#000"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintHorizontal_bias="0.042"
+                        app:layout_constraintStart_toEndOf="@+id/avatar"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.444" />
 
                     <ImageView
                         android:id="@+id/sendComment"
@@ -171,7 +183,8 @@
                         android:layout_height="40dp"
                         android:layout_gravity="end"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="@+id/inputComment"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/inputComment"
                         app:layout_constraintTop_toTopOf="parent"
                         app:srcCompat="@drawable/ic_send" />
 
@@ -179,15 +192,7 @@
 
             </androidx.cardview.widget.CardView>
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/avatar"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                app:layout_constraintBottom_toBottomOf="@+id/cardViewComment"
-                app:layout_constraintEnd_toStartOf="@+id/cardViewComment"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recyclerView2"
-                tools:srcCompat="@tools:sample/avatars" />
+
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

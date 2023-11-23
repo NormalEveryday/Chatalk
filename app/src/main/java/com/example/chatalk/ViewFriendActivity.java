@@ -125,6 +125,7 @@ public class ViewFriendActivity extends AppCompatActivity {
 
         LoadPost();
         checkUserExistance(userID);
+        decline.setVisibility(View.GONE);
 
         LoadMyProfile();
         decline.setOnClickListener(new View.OnClickListener() {
