@@ -79,17 +79,7 @@ public class ProfileActivity extends AppCompatActivity {
         safemode = findViewById(R.id.safemode);
 
 
-        edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(ProfileActivity.this, editProfileActivity.class));
-                if(State == "safemode"){
-                    Toast.makeText(ProfileActivity.this,"You don't have permission to do this",Toast.LENGTH_LONG).show();
-                }else {
-                    startActivity(new Intent(ProfileActivity.this, editProfileActivity.class));
-                }
-            }
-        });
+
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -120,6 +110,16 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(State == "safemode"){
+                    Toast.makeText(ProfileActivity.this,"You don't have permission to do this",Toast.LENGTH_SHORT).show();
+                }else {
+                    startActivity(new Intent(ProfileActivity.this, editProfileActivity.class));
+                }
+            }
+        });
         safemode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -313,4 +313,8 @@ public class ProfileActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

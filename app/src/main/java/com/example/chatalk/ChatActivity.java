@@ -261,16 +261,16 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onPause() {
-        Date date = new Date();
-        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-        final String strDate = formatter.format(date);
-        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-        super.onPause();
-
-    }
-
+//    @Override
+//    protected void onPause() {
+//        Date date = new Date();
+//        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+//        final String strDate = formatter.format(date);
+//        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
+//        super.onPause();
+//
+//    }
+//
 //    @Override
 //    protected void onStop() {
 //        Date date = new Date();
@@ -279,14 +279,14 @@ public class ChatActivity extends AppCompatActivity {
 //        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
 //        super.onStop();
 //    }
-
-    @Override
-    protected void onStart() {
-        mUserRef.child(mUser.getUid()).child("status").setValue("online");
-        super.onStart();
-    }
-
-
+//
+//    @Override
+//    protected void onStart() {
+//        mUserRef.child(mUser.getUid()).child("status").setValue("online");
+//        super.onStart();
+//    }
+//
+//
 //    @Override
 //    protected void onDestroy() {
 //        Date date = new Date();
@@ -295,7 +295,7 @@ public class ChatActivity extends AppCompatActivity {
 //        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
 //        super.onDestroy();
 //    }
-
+//
 //    @Override
 //    protected void onResume() {
 //        mUserRef.child(mUser.getUid()).child("status").setValue("online");
@@ -306,6 +306,5 @@ public class ChatActivity extends AppCompatActivity {
 //    @Override
 //    public void onBackPressed() {
 //        super.onBackPressed();
-//        finish();
 //    }
 }

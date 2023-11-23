@@ -2,6 +2,8 @@ package com.example.chatalk;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 
+import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 
@@ -80,6 +82,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -356,7 +359,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
             } else {
                 startActivity(new Intent(MainActivity.this, ChatUserActivity.class));
-                finish();
             }
 
             return true;
@@ -634,12 +636,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
+//        FirebaseDatabase.getInstance().getReference().child("Users").child(mUser.getUid()).child("status").setValue("online");
         if (mUser == null) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         } else {
-
+            Date date = new Date();
+            SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+            final String strDate = formatter.format(date);
+            DatabaseReference userStatus = FirebaseDatabase.getInstance().getReference().child("Users").child("status");
+            mRef.child(mUser.getUid()).child("status").onDisconnect().setValue("Last Seen: "+strDate);
             mRef.child(mUser.getUid()).child("status").setValue("online");
 
             mRef.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
@@ -648,6 +655,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (snapshot.exists()) {
                         profileImageUrlView = snapshot.child("profileImage").getValue().toString();
                         usernameView = snapshot.child("username").getValue().toString();
+                        mRef.child(mUser.getUid()).child("status").setValue("online");
 
                         if (profileImageUrlView != null) {
                             Picasso.get().load(profileImageUrlView).into(profileImageHeader);
@@ -677,6 +685,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        onStop();
     }
+
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+////        if(isApp(this)){
+//            Date date = new Date();
+//            SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+//            final String strDate = formatter.format(date);
+//            mRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
+////        }
+//    }
+//    public static Boolean isApp(final Context context){
+//        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+//        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
+//        if(!tasks.isEmpty()){
+//            ComponentName to = tasks.get(0).topActivity;
+//            if(!to.getPackageName().equals(context.getPackageName())){
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 }

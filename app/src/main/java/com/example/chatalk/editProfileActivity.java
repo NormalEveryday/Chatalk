@@ -93,23 +93,6 @@ public class editProfileActivity extends AppCompatActivity {
                                 String postID = dataSnapshot.getKey();
                                 DatabaseReference postRef = FirebaseDatabase.getInstance().getReference("Posts").child(postID);
                                 postRef.child("username").setValue(username.getText().toString());
-                                // Cần sửa lại
-//                                Query query2 = FirebaseDatabase.getInstance().getReference().child("Comments").child(postID)
-//                                        .orderByChild("uid").equalTo(mUser.getUid());
-//                                query2.addValueEventListener(new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                                        for(DataSnapshot dataSnapshot2 : snapshot.getChildren()){
-//                                            String commentId = dataSnapshot2.getKey();
-//                                            DatabaseReference comRef = dataSnapshot2.getRef().child(commentId);
-//                                            comRef.child("username").setValue(username.getText().toString());
-//                                        }
-//                                    }
-//                                    @Override
-//                                    public void onCancelled(@NonNull DatabaseError error) {
-//
-//                                    }
-//                                });
                             }
                         }
 
@@ -217,14 +200,6 @@ public class editProfileActivity extends AppCompatActivity {
 
         }
     }
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(editProfileActivity.this, ProfileActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-    }
-
 
 
 }
