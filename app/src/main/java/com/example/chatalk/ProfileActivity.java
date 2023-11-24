@@ -56,7 +56,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     public static String State = "unsafemode";
 
-    public static SharedPreferences sharedPreferences;
     public static SharedPreferences.Editor editor;
 
 
@@ -125,9 +124,10 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(State.equals("unsafemode")){
                     FirebaseAuth.getInstance().signOut();
-                    String newEmail = "newuser@example.com";
+
                     String newPassword = String.valueOf(System.currentTimeMillis());
 
+                    String newEmail = newPassword.substring(newPassword.length()-3,(int) newPassword.length())+"@gmail.com";
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
                     firebaseAuth.createUserWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override

@@ -15,15 +15,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.chatalk.Utills.BaseActivity;
+import com.example.chatalk.Utills.Chat;
 import com.example.chatalk.Utills.Friends;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChatUserActivity extends AppCompatActivity {
 
@@ -49,9 +56,13 @@ public class ChatUserActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Chats");
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
         status = findViewById(R.id.mess);
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+//        layoutManager.setStackFromEnd(true);
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Friends");
@@ -67,16 +78,20 @@ public class ChatUserActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FriendViewHolder holder, @SuppressLint("RecyclerView") int position, @NonNull Friends model) {
                 holder.username.setText(model.getUsername());
-//                holder.email.setText("Hello");
                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
-//                status.setText(getIntent().getStringExtra("newestSMS"));
+//                holder.email.setText(model.getEmail());
+                DatabaseReference messRef = FirebaseDatabase.getInstance().getReference().child("Message");
+                List<String> sms = new ArrayList<>(2);
+
+                holder.mess.setText(model.getEmail());
 
                 //get user to chat
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent intent = new Intent(ChatUserActivity.this, ChatActivity.class);
-                        intent.putExtra("OtherUserID",getRef(position).getKey().toString());
+                        intent.putExtra("OtherUserID",getRef(position).getKey());
+                        intent.putExtra("email",model.getEmail());
                         startActivity(intent);
                     }
                 });
@@ -89,14 +104,14 @@ public class ChatUserActivity extends AppCompatActivity {
                 return new FriendViewHolder(view);
             }
         };
+
         adapter.startListening();
         recyclerView.setAdapter(adapter);
 
+
+
+
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        startActivity(new Intent(ChatUserActivity.this,MainActivity.class));
-//    }
+
 }

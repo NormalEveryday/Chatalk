@@ -17,6 +17,7 @@ public class FriendViewHolder extends RecyclerView.ViewHolder {
         profileImage = itemView.findViewById(R.id.profileImage);
         email = itemView.findViewById(R.id.email);
         username = itemView.findViewById(R.id.userNam);
+        mess = itemView.findViewById(R.id.mess);
 
 
     }

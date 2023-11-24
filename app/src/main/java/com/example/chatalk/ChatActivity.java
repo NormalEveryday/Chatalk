@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +30,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Chat;
+import com.example.chatalk.Utills.EmailAuth;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.datatransport.runtime.scheduling.jobscheduling.SchedulerConfig;
@@ -53,16 +57,28 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
 
+    public static String newestSms;
     Toolbar toolbar;
     RecyclerView recyclerView;
 
     EditText inputSms;
-    ImageView btnSend;
+    ImageView btnSend,emailSend;
 
     CircleImageView userProfileImageAppbar;
 
@@ -81,6 +97,10 @@ public class ChatActivity extends AppCompatActivity {
     String URL = "https://fcm.googleapis.com/fcm/send";
     RequestQueue requestQueue;
 
+    public static SharedPreferences.Editor editor;
+
+
+
 
 
     @Override
@@ -89,15 +109,20 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
 
-
         OtherUserID = getIntent().getStringExtra("OtherUserID");
 
         recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+
+
         inputSms = findViewById(R.id.inputSms);
         btnSend = findViewById(R.id.btnSend);
         userProfileImageAppbar = findViewById(R.id.userProfileImageAppbar);
         usernameAppbar = findViewById(R.id.usernameAppbar);
+        emailSend = findViewById(R.id.emailSend);
+
         status = findViewById(R.id.status);
         requestQueue = Volley.newRequestQueue(this);
 
@@ -114,9 +139,69 @@ public class ChatActivity extends AppCompatActivity {
                 SendSMS();
             }
         });
+
+        layoutManager.setStackFromEnd(true);
+
         LoadSMS();
+        emailSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SendMail();
+            }
+        });
 
 
+    }
+
+    public void SendMail() {
+        try{
+            EmailAuth emailAuth = new EmailAuth();
+            emailAuth.show(getSupportFragmentManager(),"auth email");
+            String senderEmail = mUser.getEmail();
+            String receiverEmail = getIntent().getStringExtra("email");
+            Log.d("DEBUG","receiver Email : "+ receiverEmail + " and sender : " +senderEmail);
+            String passwordSenderEmail=emailAuth.getPass();
+            String host = "smtp.gmail.com";
+
+            Properties properties = System.getProperties();
+            properties.put("mail.smtp.host",host);
+            properties.put("mail.smtp.port", "465");
+            properties.put("mail.smtp.ssl.enable", "true");
+            properties.put("mail.smtp.auth", "true");
+
+
+            Session session = Session.getInstance(properties, new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(senderEmail,passwordSenderEmail);
+                }
+            });
+            MimeMessage mimeMessage = new MimeMessage(session);
+            mimeMessage.addRecipient(Message.RecipientType.TO,new InternetAddress(receiverEmail));
+            mimeMessage.setSubject("Subject: Chatalk "+ mUser.getDisplayName());
+            if(!inputSms.getText().toString().isEmpty()){
+                mimeMessage.setText(inputSms.getText().toString());
+            }else {
+                Toast.makeText(ChatActivity.this,"message is null",Toast.LENGTH_SHORT).show();
+            }
+
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Transport.send(mimeMessage);
+                        inputSms.setText("");
+                    }catch (MessagingException e){
+                        e.printStackTrace();
+                    }
+                }
+            });
+            thread.start();
+        }catch (AddressException e) {
+            e.printStackTrace();
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void LoadMyProfile() {
@@ -151,6 +236,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                     holder.secondUserText.setText(model.getSms());
+
                     Picasso.get().load(myProfileImageLink).into(holder.secondUserProfile);
 
                 }else {
@@ -162,6 +248,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
                     holder.firstUserText.setText(model.getSms());
+
                     Picasso.get().load(OtherProfileImageLink).into(holder.firstUserProfile);
                 }
             }
@@ -176,6 +263,8 @@ public class ChatActivity extends AppCompatActivity {
         };
         adapter.startListening();
         recyclerView.setAdapter(adapter);
+//        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+
     }
 
     private void SendSMS() {
@@ -261,50 +350,5 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-//    @Override
-//    protected void onPause() {
-//        Date date = new Date();
-//        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-//        final String strDate = formatter.format(date);
-//        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-//        super.onPause();
-//
-//    }
-//
-//    @Override
-//    protected void onStop() {
-//        Date date = new Date();
-//        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-//        final String strDate = formatter.format(date);
-//        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-//        super.onStop();
-//    }
-//
-//    @Override
-//    protected void onStart() {
-//        mUserRef.child(mUser.getUid()).child("status").setValue("online");
-//        super.onStart();
-//    }
-//
-//
-//    @Override
-//    protected void onDestroy() {
-//        Date date = new Date();
-//        SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-//        final String strDate = formatter.format(date);
-//        mUserRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-//        super.onDestroy();
-//    }
-//
-//    @Override
-//    protected void onResume() {
-//        mUserRef.child(mUser.getUid()).child("status").setValue("online");
-//        super.onResume();
-//    }
 
-
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//    }
 }
