@@ -7,10 +7,12 @@
     android:layout_height="?android:attr/actionBarSize"
     android:background="#131313"
     android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-    android:id="@+id/app_bar">
+    android:id="@+id/app_bar"
+    app:titleTextColor="#fff">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        />
 
 
 

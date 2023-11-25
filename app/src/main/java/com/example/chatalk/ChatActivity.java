@@ -98,7 +98,7 @@ public class ChatActivity extends AppCompatActivity {
     RequestQueue requestQueue;
 
     public static SharedPreferences.Editor editor;
-
+    String otherusename;
 
 
 
@@ -210,7 +210,7 @@ public class ChatActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
                     myProfileImageLink = snapshot.child("profileImage").getValue().toString();
-
+                    otherusename = snapshot.child("username").getValue().toString();
                 }
             }
 
@@ -274,6 +274,7 @@ public class ChatActivity extends AppCompatActivity {
             hashMap.put("sms",sms);
             hashMap.put("status","unseen");
             hashMap.put("userID",mUser.getUid());
+            hashMap.put("username",otherusename);
             smsRef.child(OtherUserID).child(mUser.getUid()).push().updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
@@ -334,6 +335,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 OtherUsername = snapshot.child("username").getValue().toString();
+
                 OtherUserStatus = snapshot.child("status").getValue().toString();
                 OtherProfileImageLink = snapshot.child("profileImage").getValue().toString();
                 Picasso.get().load(OtherProfileImageLink).into(userProfileImageAppbar);
@@ -349,6 +351,10 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-
-
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(ChatActivity.this,ChatUserActivity.class);
+        startActivity(intent);
+        finish();
+    }
 }

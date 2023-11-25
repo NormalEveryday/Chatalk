@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -165,7 +166,8 @@ public class ProfileActivity extends AppCompatActivity {
                                             State = "safemode";
                                             editor.putString(CURRENT_STATE_KEY, "safemode");
                                             editor.apply();
-                                            Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_SHORT).show();
+                                            Log.d("DEBUG","State :"+ProfileActivity.State);
                                             finish();
                                         } else {
 
@@ -209,7 +211,8 @@ public class ProfileActivity extends AppCompatActivity {
                     State = "unsafemode";
                     editor.putString(ProfileActivity.CURRENT_STATE_KEY, "unsafemode");
                     editor.apply();
-                    Toast.makeText(ProfileActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(ProfileActivity.this,ProfileActivity.State,Toast.LENGTH_SHORT).show();
+                    Log.d("DEBUG","State :"+ProfileActivity.State);
                 }
 
 
@@ -271,7 +274,8 @@ public class ProfileActivity extends AppCompatActivity {
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(ProfileActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(ProfileActivity.this, error.toString(), Toast.LENGTH_SHORT).show();
+                                Log.d("DEBUG","State :"+error.toString());
                             }
                         });
                     }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".FriendActivity">
     <include layout="@layout/main_appbar"
-        android:id="@+id/app_bar"/>
+        android:id="@+id/app_bar" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

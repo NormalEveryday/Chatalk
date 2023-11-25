@@ -53,7 +53,8 @@ public class FriendActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Friends");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitle("Friends");
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

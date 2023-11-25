@@ -29,6 +29,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.util.JsonReader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -143,7 +144,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_SHORT).show();
+        Log.d("DEBUG","State :"+ProfileActivity.State);
 
 
         toolbar = findViewById(R.id.app_bar);
@@ -151,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         getSupportActionBar().setTitle("Chatalk");
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
 
@@ -338,7 +339,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ProfileActivity.State = "unsafemode";
                 ProfileActivity.editor.putString(ProfileActivity.CURRENT_STATE_KEY, "unsafemode");
                 ProfileActivity.editor.apply();
-                Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, ProfileActivity.State, Toast.LENGTH_SHORT).show();
+                Log.d("DEBUG","State :"+ProfileActivity.State);
             }
             if (ProfileActivity.State.equals("unsafemode")) {
                 mAuth.signOut();
@@ -383,7 +385,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         JSONObject jsonObject = new JSONObject();
         JSONObject jsonObjectText = new JSONObject();
         try {
-            jsonObjectText.put("text", input + "short answer");
+            jsonObjectText.put("text", input);
             jsonObject.put("prompt", jsonObjectText);
 
         } catch (JSONException e) {

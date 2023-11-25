@@ -1,7 +1,7 @@
 package com.example.chatalk.Utills;
 
 public class Chat {
-    private String sms,status,userID,timestamp;
+    private String sms,status,userID,timestamp,username;
     Chat(){}
 
     public String getTimestamp() {
@@ -12,11 +12,20 @@ public class Chat {
         this.timestamp = timestamp;
     }
 
-    public Chat(String sms, String status, String userID, String timestamp) {
+    public Chat(String sms, String status, String userID, String timestamp,String username) {
         this.sms = sms;
         this.status = status;
         this.userID = userID;
         this.timestamp = timestamp;
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getSms() {
