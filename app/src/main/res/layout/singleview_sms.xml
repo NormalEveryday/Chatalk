@@ -17,6 +17,7 @@
 
 
     <TextView
+        android:layout_margin="4dp"
         android:id="@+id/firstUserText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -44,6 +45,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:layout_margin="4dp"
         android:textColor="#000"
         android:id="@+id/secondUserText"
         android:layout_width="0dp"

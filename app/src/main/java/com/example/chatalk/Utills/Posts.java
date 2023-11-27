@@ -5,14 +5,29 @@ public class Posts {
             postDesc,
             postImageUrl,
             userProfileImage,
-            username;
+            username,
+        status,uid;
     public Posts(){}
-    public Posts(String datePost, String postDesc, String postImageUrl, String userProfileImage, String username) {
+    public Posts(String datePost, String postDesc, String postImageUrl, String userProfileImage, String username,String status,String uid) {
         this.datePost = datePost;
         this.postDesc = postDesc;
         this.postImageUrl = postImageUrl;
         this.userProfileImage = userProfileImage;
         this.username = username;
+        this.status = status;
+        this.uid = uid;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getDatePost() {

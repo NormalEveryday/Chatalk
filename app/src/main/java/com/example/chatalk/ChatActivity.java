@@ -99,9 +99,10 @@ public class ChatActivity extends AppCompatActivity {
 
     public static SharedPreferences.Editor editor;
     String otherusename;
+    int mess_count = 0;
 
 
-
+    ImageView call;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +148,16 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 SendMail();
+            }
+        });
+
+        call = findViewById(R.id.call);
+        call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ChatActivity.this,VideoCallActivity.class);
+                intent.putExtra("OtherUserID",OtherUserID);
+                startActivity(intent);
             }
         });
 
@@ -211,6 +222,7 @@ public class ChatActivity extends AppCompatActivity {
                 if(snapshot.exists()){
                     myProfileImageLink = snapshot.child("profileImage").getValue().toString();
                     otherusename = snapshot.child("username").getValue().toString();
+
                 }
             }
 

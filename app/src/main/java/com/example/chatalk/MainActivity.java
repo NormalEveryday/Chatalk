@@ -291,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.home) {
             startActivity(new Intent(MainActivity.this, MainActivity.class));
+            finish();
         } else if (item.getItemId() == R.id.profile) {
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
         } else if (item.getItemId() == R.id.friendlist) {
@@ -361,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
             } else {
                 startActivity(new Intent(MainActivity.this, ChatUserActivity.class));
+                finish();
             }
 
             return true;
@@ -438,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        MenuItem searchIcon = menu.findItem(R.id.search_bar);
+
 
         MenuItem item = menu.findItem(R.id.assistance);
 
@@ -455,31 +457,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        SearchView searchBar = (SearchView) searchIcon.getActionView();
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        if (searchManager != null) {
-            searchBar.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        }
-
-        searchBar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            DatabaseReference originalQuery = FirebaseDatabase.getInstance().getReference("Posts");
-
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-
-                return false;
-            }
-
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                if (s.isEmpty()) {
-
-                }
-                return true;
-            }
-        });
 
         return true;
     }
@@ -548,6 +526,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
+                if(model.getStatus().equals("visible_off")){
+                    holder.itemView.setVisibility(View.GONE);
+                }else{
+                    holder.itemView.setVisibility(View.VISIBLE);
+                }
+
 
             }
 
@@ -596,6 +580,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 hashMap.put("userProfileImage", profileImageUrlView);
                                 hashMap.put("username", usernameView);
                                 hashMap.put("uid", mUser.getUid());
+                                hashMap.put("status","visible");
                                 PostRef.child(mUser.getUid() + strDate).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                                     @Override
                                     public void onComplete(@NonNull Task task) {
@@ -668,7 +653,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             usernameHeader.setText(usernameView);
                         }
                         if (emailHeader != null) {
-                            emailHeader.setText(mUser.getEmail());
+                            emailHeader.setText(snapshot.child("email").getValue().toString());
                         }
 
                     }
@@ -689,25 +674,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onBackPressed();
     }
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-////        if(isApp(this)){
-//            Date date = new Date();
-//            SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-//            final String strDate = formatter.format(date);
-//            mRef.child(mUser.getUid()).child("status").setValue("Last seen: "+strDate);
-////        }
-//    }
-//    public static Boolean isApp(final Context context){
-//        ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
-//        List<ActivityManager.RunningTaskInfo> tasks = am.getRunningTasks(1);
-//        if(!tasks.isEmpty()){
-//            ComponentName to = tasks.get(0).topActivity;
-//            if(!to.getPackageName().equals(context.getPackageName())){
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }

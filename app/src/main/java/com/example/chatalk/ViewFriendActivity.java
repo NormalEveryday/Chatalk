@@ -306,6 +306,7 @@ public class ViewFriendActivity extends AppCompatActivity {
             HashMap hashMap = new HashMap();
             hashMap.put("status","pending");
             hashMap.put("ptime", String.valueOf(System.currentTimeMillis()));
+
             requestRef.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
@@ -348,7 +349,7 @@ public class ViewFriendActivity extends AppCompatActivity {
                         hashMap.put("username",uname);
                         hashMap.put("profileImage",profileImageUrl);
                         hashMap.put("email",oemail);
-
+                        hashMap.put("ptime",String.valueOf(System.currentTimeMillis()));
 
 
 

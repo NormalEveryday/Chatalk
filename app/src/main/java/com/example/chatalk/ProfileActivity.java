@@ -67,7 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_LONG).show();
+//        Toast.makeText(ProfileActivity.this,State,Toast.LENGTH_LONG).show();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
@@ -149,7 +149,7 @@ public class ProfileActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Object o) {
 
-                                        Toast.makeText(ProfileActivity.this, "Log in", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(ProfileActivity.this, "Log in", Toast.LENGTH_SHORT).show();
                                     }
                                 });
                                 firebaseAuth.signInWithEmailAndPassword(newEmail, newPassword).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -232,6 +232,89 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull MyHolder holder, int position, @NonNull Posts model) {
                 final String postKey = getRef(position).getKey();
+
+                holder.itemView.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        PostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                    String key = dataSnapshot.getKey();
+                                    if(dataSnapshot.child("datePost").getValue().equals(model.getDatePost())
+                                            && dataSnapshot.child("username").getValue().equals(model.getUsername())
+                                            && dataSnapshot.child("uid").getValue().equals(model.getUid())){
+                                        dataSnapshot.getRef().removeValue();
+                                    }
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                });
+                if(model.getStatus().equals("visible")){
+                    ((ImageView) holder.itemView.findViewById(R.id.visible)).setImageResource(R.drawable.visible);
+                }else {
+                    ((ImageView) holder.itemView.findViewById(R.id.visible)).setImageResource(R.drawable.visible_off);
+                }
+
+                holder.itemView.findViewById(R.id.visible).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(model.getStatus().equals("visible")){
+                            Toast.makeText(ProfileActivity.this,"hide post",Toast.LENGTH_SHORT).show();
+                            PostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                        String key = dataSnapshot.getKey();
+                                        if(dataSnapshot.child("datePost").getValue().equals(model.getDatePost())
+                                                && dataSnapshot.child("username").getValue().equals(model.getUsername())
+                                                && dataSnapshot.child("uid").getValue().equals(model.getUid())){
+                                            dataSnapshot.child("status").getRef().setValue("visible_off");
+                                            ((ImageView) holder.itemView.findViewById(R.id.visible)).setImageResource(R.drawable.visible);
+
+                                        }
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
+                        }else {
+                            Toast.makeText(ProfileActivity.this,"show post",Toast.LENGTH_SHORT).show();
+                            PostRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                        String key = dataSnapshot.getKey();
+                                        if(dataSnapshot.child("datePost").getValue().equals(model.getDatePost())
+                                                && dataSnapshot.child("username").getValue().equals(model.getUsername())
+                                                && dataSnapshot.child("uid").getValue().equals(model.getUid())){
+                                            dataSnapshot.child("status").getRef().setValue("visible");
+                                            ((ImageView) holder.itemView.findViewById(R.id.visible)).setImageResource(R.drawable.visible_off);
+                                        }
+                                    }
+
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    }
+                });
                 holder.postDesc.setText(model.getPostDesc());
 //                holder.username.setText(model.getUsername());
                 holder.timeAgo.setText(model.getDatePost());
@@ -304,7 +387,7 @@ public class ProfileActivity extends AppCompatActivity {
             @NonNull
             @Override
             public MyHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_post, parent, false);
+                View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.view_post_profile, parent, false);
 
                 return new MyHolder(view);
             }

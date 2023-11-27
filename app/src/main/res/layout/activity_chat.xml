@@ -10,18 +10,19 @@
 
     <include layout="@layout/app_bar_chat"
         android:id="@+id/app_bar_chat"/>
-    <androidx.recyclerview.widget.RecyclerView
-        app:reverseLayout="true"
 
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        app:stackFromEnd="true"
-        android:padding="10dp"
+
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:padding="10dp"
         app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar_chat" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_chat"
+        app:reverseLayout="true"
+        app:stackFromEnd="true" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
@@ -68,7 +69,18 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
+    <ImageView
+        android:id="@+id/call"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="@+id/app_bar_chat"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/app_bar_chat"
+        app:layout_constraintTop_toTopOf="@+id/app_bar_chat"
+        app:layout_constraintVertical_bias="0.49"
+        app:srcCompat="@drawable/phone" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

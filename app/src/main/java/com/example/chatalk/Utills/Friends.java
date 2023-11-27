@@ -14,8 +14,6 @@ public class Friends {
         this.email = email;
     }
 
-
-
     public Friends(){}
 
     public Friends(String profileImage, String username) {
