@@ -4,7 +4,7 @@ Social networking Android application
   1.  Create your own account
   2.  Login if you already have an account/Logout
   3.  Forget password function
-  4.  Create a post
+  4.  Create a post/Delete/Hide your post
   5.  Like the post
   6.  Comment post
   7.  Make friends with another user (Request friend)
