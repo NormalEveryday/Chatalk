@@ -1,14 +1,23 @@
 package com.example.chatalk.Utills;
 
 public class Comment {
-    private String username,profileImageUrl,comment,ptime;
+    private String username,profileImageUrl,comment,ptime,uid;
     public Comment(){}
 
-    public Comment(String username, String profileImageUrl, String comment,String ptime) {
+    public Comment(String username, String profileImageUrl, String comment,String ptime,String uid) {
         this.username = username;
         this.profileImageUrl = profileImageUrl;
         this.comment = comment;
         this.ptime = ptime;
+        this.uid = uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getUid() {
+        return uid;
     }
 
     public String getPtime() {

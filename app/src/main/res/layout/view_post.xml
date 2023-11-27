@@ -33,11 +33,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
                 android:text="TextView"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/report"
                 app:layout_constraintStart_toEndOf="@+id/profileImagePost"
                 app:layout_constraintTop_toTopOf="@+id/profileImagePost" />
 
@@ -112,6 +111,16 @@
                 app:layout_constraintBottom_toBottomOf="@+id/commentsImage"
                 app:layout_constraintStart_toEndOf="@+id/commentsImage"
                 app:layout_constraintTop_toTopOf="@+id/commentsImage" />
+
+            <ImageView
+
+                android:id="@+id/report"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/profileUsernamePost"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/profileUsernamePost"
+                app:srcCompat="@drawable/report" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

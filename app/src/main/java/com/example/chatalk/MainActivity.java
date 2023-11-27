@@ -24,6 +24,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -35,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
@@ -91,6 +94,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     Toolbar toolbar;
 
+
+
     //Chatbot
     private String stringAPIKey = "AIzaSyDmod61h5FHXa-9v368ZJ1GtjkWhCWeGc8";
     private String stringURLEndPoint = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=" + stringAPIKey;
@@ -106,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
 
     CircleImageView image_profile, profileImageHeader;
+    DatabaseReference UnFollow;
 
     TextView usernameHeader, emailHeader;
 
@@ -130,8 +136,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static FirebaseRecyclerOptions<Posts> options;
     RecyclerView recyclerView;
 
+    DatabaseReference Report;
+
 
     String usernameView, profileImageUrlView;
+
+    int originalHeight;
 
 //    SharedPreferences sharedPreferences;
 //    SharedPreferences.Editor editor;
@@ -186,8 +196,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
-
+        UnFollow = FirebaseDatabase.getInstance().getReference().child("UnFollow").child(mUser.getUid());
         FirebaseMessaging.getInstance().subscribeToTopic(mUser.getUid());
+        Report = FirebaseDatabase.getInstance().getReference().child("Reports");
 
 
         //set up for gpt
@@ -290,8 +301,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.home) {
-            startActivity(new Intent(MainActivity.this, MainActivity.class));
-            finish();
+//            startActivity(new Intent(MainActivity.this, MainActivity.class));
+//            finish();
+            return false;
         } else if (item.getItemId() == R.id.profile) {
             startActivity(new Intent(MainActivity.this, ProfileActivity.class));
         } else if (item.getItemId() == R.id.friendlist) {
@@ -465,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void LoadPost() {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-        Query query = FirebaseDatabase.getInstance().getReference("Posts").orderByChild("datePost");
+        Query query = FirebaseDatabase.getInstance().getReference().child("Posts").orderByChild("datePost");
         options = new FirebaseRecyclerOptions.Builder<Posts>().setQuery(query, Posts.class).build();
         adapter = new FirebaseRecyclerAdapter<Posts, MyHolder>(options) {
             @Override
@@ -477,6 +489,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
 
+                Report.child(mUser.getUid()).child(model.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                            if(dataSnapshot.getKey().equals(model.getUid() + model.getDatePost())){
+
+                                ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                                params.height = 0;
+                                holder.itemView.setLayoutParams(params);
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+                holder.itemView.findViewById(R.id.report).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+
+                        HashMap hashMap = new HashMap();
+                        hashMap.put("uid",model.getUid());
+                        hashMap.put("datePost",model.getDatePost());
+                        hashMap.put("PostImageUrl",model.getPostImageUrl());
+                        hashMap.put("postDesc",model.getPostDesc());
+                        Report.child(mUser.getUid()).child(model.getUid()).child(model.getUid()+model.getDatePost()).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
+                            @Override
+                            public void onComplete(@NonNull Task task) {
+                                if(task.isSuccessful()){
+                                    Toast.makeText(MainActivity.this,"Report success",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+
+                        UnFollow.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                snapshot.child(model.getUid()).child("status").getRef().setValue("unfollow");
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+
+                    }
+                });
 
                 holder.countLikes(postKey, mUser.getUid(), LikeRef);
                 CommentRef = FirebaseDatabase.getInstance().getReference("Comments").child(postKey);
@@ -526,12 +593,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-                if(model.getStatus().equals("visible_off")){
-                    holder.itemView.setVisibility(View.GONE);
-                }else{
-                    holder.itemView.setVisibility(View.VISIBLE);
-                }
 
+
+                if (model.getStatus().equals("visible_off")) {
+                    // Hide the post item
+                    holder.itemView.setVisibility(View.GONE);
+
+                    // Adjust the layout parameters to make the item occupy no space
+                    ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                    params.height = 0;
+                    params.width = 0;
+                    holder.itemView.setLayoutParams(params);
+
+                    // If you want to remove the item from the dataset entirely, you can also use:
+                    // holder.itemView.setVisibility(View.GONE);
+                    // holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+                } else {
+                    // Show the post item
+                    holder.itemView.setVisibility(View.VISIBLE);
+
+                    // Reset the layout parameters to their original values
+                    ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;  // or your original height
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;   // or your original width
+                    holder.itemView.setLayoutParams(params);
+                }
 
             }
 

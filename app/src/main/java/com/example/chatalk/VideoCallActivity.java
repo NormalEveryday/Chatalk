@@ -226,7 +226,7 @@ public class VideoCallActivity extends AppCompatActivity {
     private void callJavascriptFunction(String functionString) {
         webView.post(() -> webView.evaluateJavascript(functionString, null));
     }
-
+//Written by https://github.com/NormalEveryday/Chatalk.git
     public void onPeerConnected() {
 
         isPeerConnected = true;
@@ -234,7 +234,7 @@ public class VideoCallActivity extends AppCompatActivity {
         // For example, you might want to enable certain UI elements or perform other actions.
         Log.d("VideoCallActivity", "Peer connected!");
     }
-
+                                                                                                                                                //Written by https://github.com/NormalEveryday/Chatalk.git
     @Override
     public void onBackPressed() {
         super.onBackPressed();

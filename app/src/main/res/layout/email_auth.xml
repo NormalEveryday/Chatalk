@@ -7,7 +7,7 @@
 
     <EditText
         android:textColorHint="#000"
-        android:hint="Your Gmail password"
+        android:hint="Your comment"
         android:id="@+id/passwordEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

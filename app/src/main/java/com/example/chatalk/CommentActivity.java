@@ -5,28 +5,33 @@ package com.example.chatalk;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.sax.EndElementListener;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Adapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.chatalk.Utills.BaseActivity;
 import com.example.chatalk.Utills.Comment;
+import com.example.chatalk.Utills.EmailAuth;
 import com.example.chatalk.Utills.Posts;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -65,6 +70,7 @@ public class CommentActivity extends AppCompatActivity {
 
     CircleImageView image_profile,image_comment,getImage_comment;
 
+
     TextView usernameHead,usernameComment,timeAgo,postDesc;
 
     String username,profileImageUrl;
@@ -75,7 +81,7 @@ public class CommentActivity extends AppCompatActivity {
     TextView likeCounter,commentsCounter;
     FirebaseUser mUser;
     FirebaseAuth mAuth;
-
+    EmailAuth emailAuth;
 
     FirebaseRecyclerOptions<Comment> commentOption;
     FirebaseRecyclerAdapter<Comment,CommentViewHolder> commentAdapter;
@@ -99,13 +105,14 @@ public class CommentActivity extends AppCompatActivity {
         sendComment = findViewById(R.id.sendComment);
         MyHolder.recyclerView = findViewById(R.id.recyclerView2);
 
-
+        emailAuth = new EmailAuth();
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         LikeRef = FirebaseDatabase.getInstance().getReference().child("Likes");
 
         mRef = FirebaseDatabase.getInstance().getReference().child("Users");
         StoreRef = FirebaseStorage.getInstance().getReference().child("ProfileImages");
+        CommentRef = FirebaseDatabase.getInstance().getReference().child("Comments");
         likeCounter = findViewById(R.id.likeCounter);
         commentsCounter = findViewById(R.id.commentsCount);
         mRef.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
@@ -234,6 +241,77 @@ public class CommentActivity extends AppCompatActivity {
                 holder.comment.setText(model.getComment());
                 Log.d("DEBUG","info comment:"+model.getComment()+model.getUsername()+model.getProfileImageUrl());
 
+                holder.itemView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        PopupMenu popupMenu = new PopupMenu(CommentActivity.this,view);
+                        popupMenu.getMenuInflater().inflate(R.menu.menu_comment, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                if(menuItem.getItemId() == R.id.edit ){
+                                    if(model.getUid().equals(mUser.getUid())){
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(CommentActivity.this);
+                                        builder.setTitle("Edit Comment");
+
+                                        final EditText input = new EditText(CommentActivity.this);
+                                        input.setText(model.getComment()); // Set the current comment text
+                                        builder.setView(input);
+
+                                        builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                String newComment = input.getText().toString();
+                                                if(!newComment.isEmpty()){
+                                                    updateComment(model, newComment);
+                                                }else {
+                                                    dialog.cancel();
+                                                }
+                                                 // Update the comment in the database
+                                            }
+                                        });
+
+                                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.cancel();
+                                            }
+                                        });
+
+                                        builder.show();
+                                    }
+
+
+                                } if(menuItem.getItemId() == R.id.delete) {
+                                    CommentRef.child(getIntent().getStringExtra("postKey")).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                                if( dataSnapshot.child("uid").getValue().equals(mUser.getUid())
+                                                && dataSnapshot.child("comment").getValue().equals(model.getComment())){
+
+                                                    dataSnapshot.getRef().removeValue();
+                                                }else {
+                                                    Toast.makeText(CommentActivity.this,"you cant delete others comment!",Toast.LENGTH_SHORT).show();
+                                                }
+
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+                                }
+                                return true;
+                            }
+                        });
+                        popupMenu.show();
+                    }
+                });
+
             }
             @NonNull
             @Override
@@ -250,6 +328,38 @@ public class CommentActivity extends AppCompatActivity {
         layoutManager.setReverseLayout(true);
         layoutManager.setStackFromEnd(true);
 
+    }
+    private void updateComment(Comment comment, String newComment) {
+        DatabaseReference commentRef = FirebaseDatabase.getInstance().getReference()
+                .child("Comments")
+                .child(getIntent().getStringExtra("postKey")); // Use the timestamp as the key
+
+        commentRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                    if(dataSnapshot.child("uid").getValue().equals(mUser.getUid())
+                            && dataSnapshot.child("comment").getValue().equals(comment.getComment())){
+                        dataSnapshot.child("comment").getRef().setValue(newComment).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(CommentActivity.this, "Comment updated successfully", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(CommentActivity.this, "Failed to update comment", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void AddComment() {

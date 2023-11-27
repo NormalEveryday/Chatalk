@@ -38,7 +38,7 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-
+//Written by https://github.com/NormalEveryday/Chatalk.git
 public class ViewFriendActivity extends AppCompatActivity {
     CircleImageView userImage;
     TextView username,desc;
@@ -67,7 +67,7 @@ public class ViewFriendActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+                                                                                                                                                                            //Written by https://github.com/NormalEveryday/Chatalk.git
         setContentView(R.layout.activity_view_friend);
         username = findViewById(R.id.username);
         desc = findViewById(R.id.desc);
@@ -469,6 +469,27 @@ public class ViewFriendActivity extends AppCompatActivity {
 
                     }
                 });
+                if (model.getStatus().equals("visible_off")) {
+                    // Hide the post item
+                    holder.itemView.setVisibility(View.GONE);
+
+                    // Adjust the layout parameters to make the item occupy no space
+                    ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                    params.height = 0;
+                    params.width = 0;
+                    holder.itemView.setLayoutParams(params);
+
+
+                } else {
+                    // Show the post item
+                    holder.itemView.setVisibility(View.VISIBLE);
+
+                    // Reset the layout parameters to their original values
+                    ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;  // or your original height
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;   // or your original width
+                    holder.itemView.setLayoutParams(params);
+                }
 //                Picasso.get().load(model.getUserProfileImage()).into(holder.userProfileImage);
                 Picasso.get().load(model.getPostImageUrl()).into(holder.postImage);
                 holder.countLikes(postKey,userID,LikeRef);
@@ -499,6 +520,7 @@ public class ViewFriendActivity extends AppCompatActivity {
                             }
                         });
                     }
+
                 });
 
                 holder.commentsImage.setOnClickListener(new View.OnClickListener() {
