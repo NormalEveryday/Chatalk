@@ -21,6 +21,7 @@ Social networking Android application
   18.  Watch other user profile(include their post, email, desc)
   19.  Searching for information by voice(Integrate PaLM,experiment)
   20.  Report post
+  21.  Set at unseen message
 ## Setting up
   Environment to develop Android (Android Studio)
 ## Database
