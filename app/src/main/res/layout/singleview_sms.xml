@@ -61,5 +61,29 @@
         app:layout_constraintTop_toTopOf="@+id/firstUserProfile"
         app:layout_constraintWidth_default="wrap" />
 
+    <TextView
+        android:layout_margin="16dp"
+        android:id="@+id/myStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unseen"
+        android:textSize="10sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@+id/secondUserProfile"
+        app:layout_constraintStart_toStartOf="@+id/secondUserText"
+        app:layout_constraintTop_toBottomOf="@+id/secondUserText" />
+
+    <TextView
+        android:layout_margin="16dp"
+        android:textSize="10sp"
+        android:id="@+id/friendStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unseen"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/firstUserText"
+        app:layout_constraintStart_toEndOf="@+id/firstUserProfile"
+        app:layout_constraintTop_toBottomOf="@+id/firstUserText" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

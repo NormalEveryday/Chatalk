@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,13 +34,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ChatUserActivity extends AppCompatActivity {
 
     Toolbar toolbar;
-
+    public static final int CHAT_ACTIVITY_REQUEST_CODE = 1;
     RecyclerView recyclerView;
 
     FirebaseRecyclerAdapter<Friends, FriendViewHolder> adapter;
@@ -63,18 +68,32 @@ public class ChatUserActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setReverseLayout(true);
+        layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
-//        layoutManager.setStackFromEnd(true);
+
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         mRef = FirebaseDatabase.getInstance().getReference().child("Friends");
 
         LoadFriend("");
 
+
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CHAT_ACTIVITY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                // SMS sent successfully, reload friends
+                LoadFriend("");
+            }
+        }
     }
 
     public void LoadFriend(String s) {
-        Query query = mRef.child(mUser.getUid()).orderByChild("username").startAt(s).endAt(s + "\uf8ff");
+        Query query = mRef.child(mUser.getUid()).orderByChild("ptime");
+        //.startAt(s).endAt(s + "\uf8ff")
         options = new FirebaseRecyclerOptions.Builder<Friends>().setQuery(query, Friends.class).build();
         adapter = new FirebaseRecyclerAdapter<Friends, FriendViewHolder>(options) {
             @Override
@@ -83,6 +102,7 @@ public class ChatUserActivity extends AppCompatActivity {
                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
 
                 DatabaseReference messRef = FirebaseDatabase.getInstance().getReference().child("Message");
+
 
 
                 messRef.child(mUser.getUid()).child(getRef(position).getKey()).orderByKey().limitToLast(1)
@@ -117,10 +137,79 @@ public class ChatUserActivity extends AppCompatActivity {
                         Intent intent = new Intent(ChatUserActivity.this, ChatActivity.class);
                         intent.putExtra("OtherUserID", getRef(position).getKey());
                         intent.putExtra("email", model.getEmail());
+                        Date date = new Date();
+                        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+                        final String strDate = formatter.format(date);
+                        intent.putExtra("seenStatus","seen: "+ strDate);
                         startActivity(intent);
+
                         finish();
                     }
                 });
+
+                holder.itemView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(ChatUserActivity.this,"click",Toast.LENGTH_SHORT).show();
+                        PopupMenu popupMenu = new PopupMenu(ChatUserActivity.this,view);
+                        popupMenu.getMenuInflater().inflate(R.menu.menu_chat, popupMenu.getMenu());
+                        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem menuItem) {
+                                if(menuItem.getItemId() == R.id.unseen){
+                                    DatabaseReference messRef = FirebaseDatabase.getInstance().getReference().child("Message");
+                                    messRef.child(getRef(position).getKey()).child(mUser.getUid()).orderByChild("ptime").limitToLast(1).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                                dataSnapshot.child("status").getRef().setValue("unseen");
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+
+                                }
+                                if(menuItem.getItemId() == R.id.deletMess){
+                                    mRef.child(mUser.getUid()).child(getRef(position).getKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            if(snapshot.exists()){
+                                                snapshot.child("statusMessage").getRef().setValue("hide");
+                                            }
+
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                }
+                                return true;
+                            }
+                        });
+                        popupMenu.show();
+                    }
+                });
+
+                if(model.getStatusMessage().equals("hide")){
+                    holder.itemView.setVisibility(View.GONE);
+
+                    ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                    params.height = 0;
+                    params.width = 0;
+                    holder.itemView.setLayoutParams(params);
+                }else {
+                    holder.itemView.setVisibility(View.VISIBLE);
+                    ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                    params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                    params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                    holder.itemView.setLayoutParams(params);
+                }
 
 
             }

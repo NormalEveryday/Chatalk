@@ -18,6 +18,7 @@ import android.provider.Settings;
 import android.sax.EndElementListener;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,10 +89,10 @@ public class CommentActivity extends AppCompatActivity {
 
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_comment);
         image_profile = findViewById(R.id.profileImagePost);
         usernameHead = findViewById(R.id.profileUsernamePost);
@@ -223,6 +224,8 @@ public class CommentActivity extends AppCompatActivity {
 
     }
 
+
+
     private void LoadComment() {
 
         MyHolder.recyclerView.setLayoutManager(new LinearLayoutManager(CommentActivity.this));
@@ -239,13 +242,33 @@ public class CommentActivity extends AppCompatActivity {
                 Picasso.get().load(model.getProfileImageUrl()).into(holder.profileImage);
                 holder.username.setText(model.getUsername());
                 holder.comment.setText(model.getComment());
-                Log.d("DEBUG","info comment:"+model.getComment()+model.getUsername()+model.getProfileImageUrl());
+                Log.d("DEBUG","onlyuid"+getIntent().getStringExtra("otheruid"));
+
+                if(model.getStatus().equals("private")){
+                    if(model.getUid().equals(mUser.getUid()) || (mUser.getUid().equals(getIntent().getStringExtra("otheruid")))){
+                        holder.itemView.setVisibility(View.VISIBLE);
+
+                        // Reset the layout parameters to their original values
+                        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;  // or your original height
+                        params.width = ViewGroup.LayoutParams.MATCH_PARENT;   // or your original width
+                        holder.itemView.setLayoutParams(params);
+                    }else {
+                        holder.itemView.setVisibility(View.GONE);
+
+                        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                        params.height = 0;
+                        params.width = 0;
+                        holder.itemView.setLayoutParams(params);
+                    }
+                }
 
                 holder.itemView.findViewById(R.id.menu).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         PopupMenu popupMenu = new PopupMenu(CommentActivity.this,view);
                         popupMenu.getMenuInflater().inflate(R.menu.menu_comment, popupMenu.getMenu());
+
                         popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                             @Override
                             public boolean onMenuItemClick(MenuItem menuItem) {
@@ -287,8 +310,12 @@ public class CommentActivity extends AppCompatActivity {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                                if( dataSnapshot.child("uid").getValue().equals(mUser.getUid())
-                                                && dataSnapshot.child("comment").getValue().equals(model.getComment())){
+                                                if( dataSnapshot.child("uid").getValue().equals(model.getUid())
+                                                        && dataSnapshot.child("comment").getValue().equals(model.getComment())
+                                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime())
+                                                        || dataSnapshot.child("uid").getValue().equals(mUser.getUid())
+                                                        && dataSnapshot.child("comment").getValue().equals(model.getComment())
+                                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime())){
 
                                                     dataSnapshot.getRef().removeValue();
                                                 }else {
@@ -304,6 +331,33 @@ public class CommentActivity extends AppCompatActivity {
                                         }
                                     });
 
+                                }
+                                if(menuItem.getItemId() == R.id.privateComment){
+                                    CommentRef.child(getIntent().getStringExtra("postKey")).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                                if(dataSnapshot.child("uid").getValue().equals(mUser.getUid())
+                                                        && dataSnapshot.child("comment").getValue().equals(model.getComment())){
+                                                    if(dataSnapshot.child("status").getValue().equals("public")){
+                                                        dataSnapshot.child("status").getRef().setValue("private");
+                                                        Toast.makeText(CommentActivity.this,"Change to private",Toast.LENGTH_SHORT).show();
+
+                                                    }else {
+                                                        dataSnapshot.child("status").getRef().setValue("public");
+                                                        Toast.makeText(CommentActivity.this,"Change to public",Toast.LENGTH_SHORT).show();
+
+                                                    }
+
+                                                }
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
                                 }
                                 return true;
                             }
@@ -380,6 +434,7 @@ public class CommentActivity extends AppCompatActivity {
                     hashMap.put("username",username);
                     hashMap.put("uid",mUser.getUid());
                     hashMap.put("profileImageUrl",profileImageUrl);
+                    hashMap.put("status","public");
                     Log.d("DEBUG","text: "+username + profileImageUrl);
                     DatabaseReference dataref = FirebaseDatabase.getInstance().getReference().child("Comments").child(getIntent().getStringExtra("postKey"));
                     dataref.child(timestamp).setValue(hashMap).addOnCompleteListener(new OnCompleteListener<Void>() {

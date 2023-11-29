@@ -588,6 +588,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         intent.putExtra("postKey", postKey);
                         intent.putExtra("datePost", model.getDatePost());
                         intent.putExtra("postKey", postKey);
+                        intent.putExtra("otheruid",model.getUid());
                         startActivity(intent);
 
                     }
@@ -599,15 +600,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     // Hide the post item
                     holder.itemView.setVisibility(View.GONE);
 
-                    // Adjust the layout parameters to make the item occupy no space
                     ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
                     params.height = 0;
                     params.width = 0;
                     holder.itemView.setLayoutParams(params);
 
-                    // If you want to remove the item from the dataset entirely, you can also use:
-                    // holder.itemView.setVisibility(View.GONE);
-                    // holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
                 } else {
                     // Show the post item
                     holder.itemView.setVisibility(View.VISIBLE);
@@ -758,6 +755,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        finish();
     }
 
 }

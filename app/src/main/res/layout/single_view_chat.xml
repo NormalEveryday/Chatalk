@@ -34,14 +34,14 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:textColor="#000"
                 android:id="@+id/userNam"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="TextView"
+                android:textColor="#000"
                 android:textSize="24dp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/menu"
                 app:layout_constraintStart_toEndOf="@+id/profileImage"
                 app:layout_constraintTop_toTopOf="@+id/profileImage" />
 
@@ -55,6 +55,15 @@
                 app:layout_constraintEnd_toEndOf="@+id/userNam"
                 app:layout_constraintStart_toStartOf="@+id/userNam"
                 app:layout_constraintTop_toBottomOf="@+id/userNam" />
+
+            <ImageView
+                android:id="@+id/menu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/userNam"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/userNam"
+                app:srcCompat="@drawable/menu" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

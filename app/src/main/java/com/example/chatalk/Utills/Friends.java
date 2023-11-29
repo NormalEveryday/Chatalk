@@ -4,10 +4,18 @@ public class Friends {
     private String profileImage;
     private String username;
 
-
+    private String statusMessage;
     private String email;
     public String getEmail() {
         return email;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
     }
 
     public void setEmail(String email) {

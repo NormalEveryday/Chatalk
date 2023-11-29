@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/unseen"
+        android:title="Set to unseen" />
+    <item
+        android:id="@+id/deletMess"
+        android:title="Delete" />
+
+
+</menu>

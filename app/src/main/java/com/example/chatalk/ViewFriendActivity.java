@@ -350,7 +350,7 @@ public class ViewFriendActivity extends AppCompatActivity {
                         hashMap.put("profileImage",profileImageUrl);
                         hashMap.put("email",oemail);
                         hashMap.put("ptime",String.valueOf(System.currentTimeMillis()));
-
+                        hashMap.put("statusMessage","show");
 
 
                         final HashMap hashMap1 = new HashMap();
@@ -358,7 +358,8 @@ public class ViewFriendActivity extends AppCompatActivity {
                         hashMap1.put("profileImage",myprofileImage);
                         hashMap1.put("status","friend");
                         hashMap1.put("email",email);
-
+                        hashMap1.put("statusMessage","show");
+                        hashMap1.put("ptime",String.valueOf(System.currentTimeMillis()));
 
                         friendRef.child(mUser.getUid()).child(userID).updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                             @Override

@@ -7,4 +7,8 @@
         android:id="@+id/edit"
         android:title="edit"
         android:icon="@drawable/edit_black"/>
+    <item
+        android:id="@+id/privateComment"
+        android:title="Privacy changes"
+        android:icon="@drawable/edit_black"/>
 </menu>

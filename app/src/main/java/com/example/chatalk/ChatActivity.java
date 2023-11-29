@@ -88,6 +88,9 @@ public class ChatActivity extends AppCompatActivity {
     DatabaseReference mUserRef,smsRef;
     FirebaseAuth mAuth;
     FirebaseUser mUser;
+    Boolean visible = false;
+
+    TextView myStatus, friendStatus;
     String OtherUsername, OtherProfileImageLink,OtherUserStatus;
 
     FirebaseRecyclerOptions<Chat> options;
@@ -237,9 +240,14 @@ public class ChatActivity extends AppCompatActivity {
     private void LoadSMS() {
         options = new FirebaseRecyclerOptions.Builder<Chat>().setQuery(smsRef.child(mUser.getUid()).child(OtherUserID),Chat.class).build();
         adapter = new FirebaseRecyclerAdapter<Chat, ChatViewHolder>(options) {
+
             @Override
             protected void onBindViewHolder(@NonNull ChatViewHolder holder, int position, @NonNull Chat model) {
-                if(model.getUserID().equals(mUser.getUid())){
+                //logic seen or unseen
+
+
+                if (model.getUserID().equals(mUser.getUid())) {
+                    // existing code
                     holder.firstUserText.setVisibility(View.GONE);
                     holder.firstUserProfile.setVisibility(View.GONE);
                     holder.secondUserProfile.setVisibility(View.VISIBLE);
@@ -251,19 +259,73 @@ public class ChatActivity extends AppCompatActivity {
 
                     Picasso.get().load(myProfileImageLink).into(holder.secondUserProfile);
 
-                }else {
+
+
+                } else {
+
+                    // Set the visibility of myStatus TextView based on the status
                     holder.firstUserText.setVisibility(View.VISIBLE);
                     holder.firstUserProfile.setVisibility(View.VISIBLE);
                     holder.secondUserProfile.setVisibility(View.GONE);
                     holder.secondUserText.setVisibility(View.GONE);
 
+                    DatabaseReference messRef = FirebaseDatabase.getInstance().getReference().child("Message");
+                    messRef.child(OtherUserID).child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                                if(dataSnapshot.child("userID").getValue().equals(OtherUserID)
+                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime())){
+                                    dataSnapshot.child("status").getRef().setValue("seen at: \n "+CurrentDate());
+                                }
 
+                            }
+                        }
 
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                     holder.firstUserText.setText(model.getSms());
-
                     Picasso.get().load(OtherProfileImageLink).into(holder.firstUserProfile);
+
+
                 }
+                holder.itemView.findViewById(R.id.secondUserText).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(mUser.getUid().equals(model.getUserID())){
+                            holder.myStatus.setText(model.getStatus());
+                            Log.d("DEBUG","onlsfd "+model.getStatus());
+                            holder.itemView.findViewById(R.id.myStatus).setVisibility(View.VISIBLE);
+
+
+
+                        }else {
+                            holder.myStatus.setText(model.getPtime());
+                            holder.itemView.findViewById(R.id.myStatus).setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                });
+
+                holder.itemView.findViewById(R.id.firstUserText).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(!model.getUserID().equals(mUser.getUid())){
+                            holder.friendStatus.setText(model.getPtime());
+                            holder.itemView.findViewById(R.id.friendStatus).setVisibility(View.VISIBLE);
+                        }else {
+                            holder.friendStatus.setText(model.getStatus());
+                            holder.itemView.findViewById(R.id.friendStatus).setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                });
+
             }
+
 
             @NonNull
             @Override
@@ -275,8 +337,14 @@ public class ChatActivity extends AppCompatActivity {
         };
         adapter.startListening();
         recyclerView.setAdapter(adapter);
-//        recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
 
+
+    }
+    public String CurrentDate(){
+        Date date = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+        final String strDate = formatter.format(date);
+        return strDate;
     }
 
     private void SendSMS() {
@@ -287,6 +355,8 @@ public class ChatActivity extends AppCompatActivity {
             hashMap.put("status","unseen");
             hashMap.put("userID",mUser.getUid());
             hashMap.put("username",otherusename);
+            hashMap.put("ptime",CurrentDate());
+
             smsRef.child(OtherUserID).child(mUser.getUid()).push().updateChildren(hashMap).addOnCompleteListener(new OnCompleteListener() {
                 @Override
                 public void onComplete(@NonNull Task task) {
@@ -294,7 +364,41 @@ public class ChatActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task task) {
                             if(task.isSuccessful()){
+                                // Update status for the recipient
+
                                 sendNotification(sms);
+                                DatabaseReference friendRef = FirebaseDatabase.getInstance().getReference().child("Friends");
+                                friendRef.child(OtherUserID).child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        snapshot.child("ptime").getRef().setValue(String.valueOf(System.currentTimeMillis()));
+                                        if(snapshot.child("statusMessage").getValue().equals("hide")){
+                                            snapshot.child("statusMessage").getRef().setValue("show");
+                                        }
+                                        friendRef.child(mUser.getUid()).child(OtherUserID).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                snapshot.child("ptime").getRef().setValue(String.valueOf(System.currentTimeMillis()));
+
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });
+                                Intent resultIntent = new Intent();
+                                setResult(RESULT_OK, resultIntent);
+
+
+
                                 inputSms.setText("");
                             }
 
@@ -362,6 +466,8 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     @Override
     public void onBackPressed() {
