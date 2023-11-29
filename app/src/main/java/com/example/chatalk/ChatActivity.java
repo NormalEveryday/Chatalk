@@ -118,6 +118,7 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
 //        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
         recyclerView.setLayoutManager(layoutManager);
 
 
@@ -144,7 +145,7 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
 
-        layoutManager.setStackFromEnd(true);
+
 
         LoadSMS();
         emailSend.setOnClickListener(new View.OnClickListener() {
@@ -400,6 +401,8 @@ public class ChatActivity extends AppCompatActivity {
 
 
                                 inputSms.setText("");
+                                int lastVisibleItemPosition = adapter.getItemCount() - 1;
+                                recyclerView.smoothScrollToPosition(lastVisibleItemPosition);
                             }
 
                         }
