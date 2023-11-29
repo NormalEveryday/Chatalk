@@ -207,13 +207,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 PackageManager.PERMISSION_GRANTED);
 
 
-//        textView = findViewById(R.id.textViewgpt);
-//        editText = findViewById(R.id.editTextgpt);
+
 
         textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
-                textToSpeech.setSpeechRate((float) 0.8);
+
+                if (textToSpeech != null && i == TextToSpeech.SUCCESS) {
+                    // Text-to-speech engine initialized successfully
+                    textToSpeech.setSpeechRate((float) 0.8);
+                } else {
+                    // Initialization failed
+                    Log.e("TTS", "Initialization failed");
+                }
             }
         });
 
@@ -626,6 +632,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return new MyHolder(view);
             }
         };
+
+
         adapter.startListening();
         recyclerView.setAdapter(adapter);
         LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
@@ -653,6 +661,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
+                        int lastVisibleItemPosition = adapter.getItemCount() - 1;
+                        recyclerView.smoothScrollToPosition(lastVisibleItemPosition);
                         postImageRef.child(mUser.getUid() + strDate).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
                             public void onSuccess(Uri uri) {
@@ -692,6 +702,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
 
         }
+
+
     }
 
 

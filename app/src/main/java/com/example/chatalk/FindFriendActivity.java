@@ -180,6 +180,10 @@ public class FindFriendActivity extends AppCompatActivity {
                                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                 holder.username.setText(model.getUsername());
                                 holder.email.setText(model.getEmail());
+                                if(model.getStatus()!="online"){
+                                    holder.state.setText("offline");
+                                }
+
                             }else {
                                 holder.itemView.setVisibility(View.GONE);
                                 holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0,0));
@@ -223,6 +227,9 @@ public class FindFriendActivity extends AppCompatActivity {
                                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                 holder.username.setText(model.getUsername());
                                 holder.email.setText(model.getEmail());
+                                if(model.getStatus()!="online"){
+                                    holder.state.setText("offline");
+                                }
                             }else {
                                 holder.itemView.setVisibility(View.GONE);
                                 holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0,0));

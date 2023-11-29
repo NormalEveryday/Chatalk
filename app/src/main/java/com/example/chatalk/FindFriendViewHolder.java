@@ -15,12 +15,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class FindFriendViewHolder extends RecyclerView.ViewHolder {
     CircleImageView profileImage;
-    TextView username,email;
+    TextView username,email,state;
     public FindFriendViewHolder(@NonNull View itemView) {
         super(itemView);
         profileImage = itemView.findViewById(R.id.profileImage);
         username = itemView.findViewById(R.id.userNam);
         email = itemView.findViewById(R.id.email);
+        state = itemView.findViewById(R.id.state);
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
