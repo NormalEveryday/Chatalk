@@ -22,7 +22,7 @@
   19. Tìm kiếm thông tin bằng giọng nói (Tích hợp PaLM,thử nghiệm)
   20. Bài báo cáo
   21. Đặt ở tin nhắn chưa xem
-## Đang cài đặt
+## IDE
   Môi trường phát triển Android (Android Studio)
-## Cơ sở dữ liệu
+## Databse
   Cơ sở dữ liệu thời gian thực (firebase)
