@@ -1,4 +1,4 @@
-package com.example.chatalk;
+fpackage com.example.chatalk;
 
 import static android.Manifest.permission.RECORD_AUDIO;
 
@@ -164,8 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
-        // Access your API key as a Build Configuration variable
-        String apiKey = "AIzaSyAqNmllczUTlKBq7GbXCDe5NpiIR2hVETU";
+
 
 
 
