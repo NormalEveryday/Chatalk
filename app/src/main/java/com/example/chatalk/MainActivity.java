@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     //Chatbot
-    private String stringAPIKey = "AIzaSyDmod61h5FHXa-9v368ZJ1GtjkWhCWeGc8";
+    private String stringAPIKey = "API_PALM";
     private String stringURLEndPoint = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=" + stringAPIKey;
     private String stringOutput = "";
 
