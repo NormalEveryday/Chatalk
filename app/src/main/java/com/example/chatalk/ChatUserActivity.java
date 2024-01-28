@@ -210,7 +210,27 @@ public class ChatUserActivity extends AppCompatActivity {
                     params.width = ViewGroup.LayoutParams.MATCH_PARENT;
                     holder.itemView.setLayoutParams(params);
                 }
+                DatabaseReference UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
+                UserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                            if(dataSnapshot.child("email").getValue().equals(model.getEmail())){
+                                if(!dataSnapshot.child("status").getValue().equals("online")){
+                                    holder.status.setText("offline");
+                                }else {
+                                    holder.status.setText(dataSnapshot.child("status").getValue().toString());
+                                }
 
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
             }
 
@@ -230,7 +250,10 @@ public class ChatUserActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ChatUserActivity.this,MainActivity.class));
+        Intent intent = new Intent(ChatUserActivity.this,MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+
         finish();
     }
 }

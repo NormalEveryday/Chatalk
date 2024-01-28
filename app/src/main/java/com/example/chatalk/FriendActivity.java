@@ -9,10 +9,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 
@@ -31,6 +33,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -173,6 +176,29 @@ private void CheckFriendExist() {
                 holder.email.setText(model.getEmail());
                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
 
+
+                DatabaseReference UserRef = FirebaseDatabase.getInstance().getReference().child("Users");
+                UserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for(DataSnapshot dataSnapshot: snapshot.getChildren()){
+                            if(dataSnapshot.child("email").getValue().equals(model.getEmail())){
+                                if(!dataSnapshot.child("status").getValue().equals("online")){
+                                    holder.status.setText("offline");
+                                }else {
+                                    holder.status.setText(dataSnapshot.child("status").getValue().toString());
+                                }
+
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
                 //get user to chat
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -197,4 +223,6 @@ private void CheckFriendExist() {
         recyclerView.setAdapter(adapter);
 
     }
+
+
 }

@@ -302,6 +302,8 @@ public class CommentActivity extends AppCompatActivity {
                                         });
 
                                         builder.show();
+                                    }else{
+                                        Toast.makeText(CommentActivity.this,"you don't have permission!",Toast.LENGTH_SHORT).show();
                                     }
 
 
@@ -310,12 +312,12 @@ public class CommentActivity extends AppCompatActivity {
                                         @Override
                                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                                             for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                                if( dataSnapshot.child("uid").getValue().equals(model.getUid())
+                                                if( (mUser.getUid().equals(getIntent().getStringExtra("otheruid")))
+//                                                        && dataSnapshot.child("comment").getValue().equals(model.getComment())
+//                                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime())
+                                                        || (dataSnapshot.child("uid").getValue().equals(mUser.getUid())
                                                         && dataSnapshot.child("comment").getValue().equals(model.getComment())
-                                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime())
-                                                        || dataSnapshot.child("uid").getValue().equals(mUser.getUid())
-                                                        && dataSnapshot.child("comment").getValue().equals(model.getComment())
-                                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime())){
+                                                        && dataSnapshot.child("ptime").getValue().equals(model.getPtime()))){
 
                                                     dataSnapshot.getRef().removeValue();
                                                 }else {
@@ -349,6 +351,8 @@ public class CommentActivity extends AppCompatActivity {
 
                                                     }
 
+                                                }else{
+                                                    Toast.makeText(CommentActivity.this,"you don't have permission!",Toast.LENGTH_SHORT).show();
                                                 }
                                             }
                                         }

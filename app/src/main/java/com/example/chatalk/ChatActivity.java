@@ -369,7 +369,7 @@ public class ChatActivity extends AppCompatActivity {
 
                                 sendNotification(sms);
                                 DatabaseReference friendRef = FirebaseDatabase.getInstance().getReference().child("Friends");
-                                friendRef.child(OtherUserID).child(mUser.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                friendRef.child(mUser.getUid()).child(OtherUserID).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         snapshot.child("ptime").getRef().setValue(String.valueOf(System.currentTimeMillis()));
@@ -388,6 +388,8 @@ public class ChatActivity extends AppCompatActivity {
 
                                             }
                                         });
+
+
                                     }
 
                                     @Override
@@ -395,14 +397,14 @@ public class ChatActivity extends AppCompatActivity {
 
                                     }
                                 });
-                                Intent resultIntent = new Intent();
-                                setResult(RESULT_OK, resultIntent);
+                                int lastVisibleItemPosition = adapter.getItemCount();
+                                recyclerView.smoothScrollToPosition(lastVisibleItemPosition);
+
 
 
 
                                 inputSms.setText("");
-                                int lastVisibleItemPosition = adapter.getItemCount() - 1;
-                                recyclerView.smoothScrollToPosition(lastVisibleItemPosition);
+
                             }
 
                         }

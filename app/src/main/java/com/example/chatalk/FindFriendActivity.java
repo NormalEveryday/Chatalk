@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,8 +74,14 @@ public class FindFriendActivity extends AppCompatActivity {
         requestRecyclerView = findViewById(R.id.requestRecycler);
         titleRequest = findViewById(R.id.titleRequest);
         requestRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         LoadRequest();
         LoadUser("");
+
+        // Move the smooth scroll code here, after loading the data
+        if (adapter != null && adapter.getItemCount() > 0) {
+            recyclerView.scrollToPosition(adapter.getItemCount()-1);
+        }
 
     }
 
@@ -180,9 +187,7 @@ public class FindFriendActivity extends AppCompatActivity {
                                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                 holder.username.setText(model.getUsername());
                                 holder.email.setText(model.getEmail());
-                                if(model.getStatus()!="online"){
-                                    holder.state.setText("offline");
-                                }
+
 
                             }else {
                                 holder.itemView.setVisibility(View.GONE);
@@ -227,9 +232,7 @@ public class FindFriendActivity extends AppCompatActivity {
                                 Picasso.get().load(model.getProfileImage()).into(holder.profileImage);
                                 holder.username.setText(model.getUsername());
                                 holder.email.setText(model.getEmail());
-                                if(model.getStatus()!="online"){
-                                    holder.state.setText("offline");
-                                }
+
                             }else {
                                 holder.itemView.setVisibility(View.GONE);
                                 holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0,0));
@@ -261,6 +264,7 @@ public class FindFriendActivity extends AppCompatActivity {
                         }
                     };
                 }
+
                 adapter.startListening();
                 recyclerView.setAdapter(adapter);
             }

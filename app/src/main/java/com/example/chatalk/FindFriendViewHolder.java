@@ -21,7 +21,7 @@ public class FindFriendViewHolder extends RecyclerView.ViewHolder {
         profileImage = itemView.findViewById(R.id.profileImage);
         username = itemView.findViewById(R.id.userNam);
         email = itemView.findViewById(R.id.email);
-        state = itemView.findViewById(R.id.state);
+
 
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override

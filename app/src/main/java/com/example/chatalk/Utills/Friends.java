@@ -2,7 +2,7 @@ package com.example.chatalk.Utills;
 
 public class Friends {
     private String profileImage;
-    private String username;
+    private String username,state;
 
     private String statusMessage;
     private String email;
@@ -27,6 +27,14 @@ public class Friends {
     public Friends(String profileImage, String username) {
         this.profileImage = profileImage;
         this.username = username;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getProfileImage() {

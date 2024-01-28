@@ -18,7 +18,6 @@ public class FriendViewHolder extends RecyclerView.ViewHolder {
         email = itemView.findViewById(R.id.email);
         username = itemView.findViewById(R.id.userNam);
         mess = itemView.findViewById(R.id.mess);
-
-
+        status = itemView.findViewById(R.id.State);
     }
 }

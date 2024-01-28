@@ -3,6 +3,7 @@ package com.example.chatalk;
 import static android.Manifest.permission.RECORD_AUDIO;
 
 import android.app.ActivityManager;
+import android.app.LocaleConfig;
 import android.content.ComponentName;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
@@ -90,6 +91,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.grpc.android.BuildConfig;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     Toolbar toolbar;
@@ -100,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String stringAPIKey = "AIzaSyDmod61h5FHXa-9v368ZJ1GtjkWhCWeGc8";
     private String stringURLEndPoint = "https://generativelanguage.googleapis.com/v1beta3/models/text-bison-001:generateText?key=" + stringAPIKey;
     private String stringOutput = "";
+
 
     private TextToSpeech textToSpeech;
 
@@ -160,6 +163,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
+
+        // Access your API key as a Build Configuration variable
+        String apiKey = "AIzaSyAqNmllczUTlKBq7GbXCDe5NpiIR2hVETU";
+
 
 
         getSupportActionBar().setTitle("Chatalk");
@@ -263,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (matches != null) {
                     string = matches.get(0);
 //                    editText.setText(string);
-                    chatGPTModel(string);
+                    PaLM(string);
                 }
             }
 
@@ -380,6 +387,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MainActivity.this, "You don't have permission to do this", Toast.LENGTH_LONG).show();
             } else {
                 startActivity(new Intent(MainActivity.this, ChatUserActivity.class));
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 finish();
             }
 
@@ -399,58 +407,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void chatGPTModel(String input) {
+    private void PaLM(String input) {
 
 
-        JSONObject jsonObject = new JSONObject();
-        JSONObject jsonObjectText = new JSONObject();
-        try {
-            jsonObjectText.put("text", input);
-            jsonObject.put("prompt", jsonObjectText);
+//        JSONObject jsonObject = new JSONObject();
+//        JSONObject jsonObjectText = new JSONObject();
+//        try {
+//            jsonObjectText.put("text", input);
+//            jsonObject.put("prompt", jsonObjectText);
+//
+//        } catch (JSONException e) {
+//            throw new RuntimeException(e);
+//        }
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
+//                stringURLEndPoint,
+//                jsonObject,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            String stringOutput = response.getJSONArray("candidates")
+//                                    .getJSONObject(0)
+//                                    .getString("output");
+//
+////                            textView.setText(stringOutput);
+//                            //say it
+//                            textToSpeech.speak(stringOutput, TextToSpeech.QUEUE_FLUSH, null, null);
+//                        } catch (JSONException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+////                textView.setText("Error");
+//                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+//            }
+//        }) {
+//            @Override
+//            public Map<String, String> getHeaders() throws AuthFailureError {
+//                Map<String, String> mapHeader = new HashMap<>();
+//                mapHeader.put("Content-Type", "application/json");
+//                return mapHeader;
+//            }
+//        };
+//        int intTimeoutPeriod = 60000; //60 seconds
+//        RetryPolicy retryPolicy = new DefaultRetryPolicy(intTimeoutPeriod,
+//                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+//                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+//
+//        jsonObjectRequest.setRetryPolicy(retryPolicy);
+//        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
 
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST,
-                stringURLEndPoint,
-                jsonObject,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String stringOutput = response.getJSONArray("candidates")
-                                    .getJSONObject(0)
-                                    .getString("output");
-
-//                            textView.setText(stringOutput);
-                            //say it
-                            textToSpeech.speak(stringOutput, TextToSpeech.QUEUE_FLUSH, null, null);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-//                textView.setText("Error");
-                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> mapHeader = new HashMap<>();
-                mapHeader.put("Content-Type", "application/json");
-                return mapHeader;
-            }
-        };
-        int intTimeoutPeriod = 60000; //60 seconds
-        RetryPolicy retryPolicy = new DefaultRetryPolicy(intTimeoutPeriod,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-
-        jsonObjectRequest.setRetryPolicy(retryPolicy);
-        Volley.newRequestQueue(getApplicationContext()).add(jsonObjectRequest);
     }
 
 
@@ -661,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
                     if (task.isSuccessful()) {
-                        int lastVisibleItemPosition = adapter.getItemCount() - 1;
+                        int lastVisibleItemPosition = adapter.getItemCount();
                         recyclerView.smoothScrollToPosition(lastVisibleItemPosition);
                         postImageRef.child(mUser.getUid() + strDate).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                             @Override
@@ -727,9 +736,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Date date = new Date();
             SimpleDateFormat formatter =new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
             final String strDate = formatter.format(date);
-            DatabaseReference userStatus = FirebaseDatabase.getInstance().getReference().child("Users").child("status");
-            mRef.child(mUser.getUid()).child("status").onDisconnect().setValue("Last Seen: "+strDate);
-            mRef.child(mUser.getUid()).child("status").setValue("online");
+
+            DatabaseReference userStatus = FirebaseDatabase.getInstance().getReference().child("Users");
+            mRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    for(DataSnapshot dataSnapshot:snapshot.getChildren()){
+                        if(dataSnapshot.getKey().equals(mUser.getUid())){
+                            if(!dataSnapshot.child("email").getValue().equals("")){
+                                mRef.child(mUser.getUid()).child("status").onDisconnect().setValue("Last Seen: "+strDate);
+                                mRef.child(mUser.getUid()).child("status").setValue("online");
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
 
             mRef.child(mUser.getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
@@ -767,6 +795,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         finish();
     }
 

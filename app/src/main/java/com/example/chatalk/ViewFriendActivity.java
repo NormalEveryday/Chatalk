@@ -416,6 +416,7 @@ public class ViewFriendActivity extends AppCompatActivity {
                         Intent intent = new Intent(ViewFriendActivity.this,ChatActivity.class);
                         intent.putExtra("OtherUserID",userID);
                         startActivity(intent);
+                        finish();
 
                     }
                 }
